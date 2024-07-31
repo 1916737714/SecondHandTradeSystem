@@ -39,11 +39,11 @@ class Login {
 
         Box(modifier = modifier) {
             Image(
-                painter = painterResource(id = R.drawable.image5),
+                painter = painterResource(id = R.drawable.login),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
-                alpha = 0.5f,
+                alpha = 0.7f,
             )
             Column(
                 modifier = Modifier
@@ -87,10 +87,7 @@ class Login {
                     },
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(
                             checked = rememberUser.value,
@@ -98,8 +95,7 @@ class Login {
                         )
                         Text(text = "记住密码", color = Color.Gray)
                     }
-                    Text(text = "注册", fontSize = 16.sp, color = Color.Gray, modifier = Modifier.padding(vertical = 12.dp, horizontal = 5.dp))
-                }
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 
