@@ -59,6 +59,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+//    implementation(libs.androidx.datastore.core.android)
+//    implementation(libs.androidx.datastore.preferences.core.jvm)
+    implementation("androidx.datastore:datastore-preferences:1.1.1") // 或根据 libs.versions.toml
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
