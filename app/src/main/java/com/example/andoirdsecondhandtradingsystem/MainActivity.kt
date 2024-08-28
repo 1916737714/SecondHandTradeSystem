@@ -1,5 +1,5 @@
 package com.example.andoirdsecondhandtradingsystem
-
+//当你完成一个模块或者是什么的时候或者是代码修改了，记得提交到远程仓库
 import ScreenPage
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -106,10 +106,23 @@ class MainActivity : ComponentActivity() {
 fun MainContent() {
     var selectedScreen by remember { mutableStateOf<ScreenPage>(ScreenPage.Home) }
 
+    var topBarTitle by remember { mutableStateOf("Home") }  // 用于存储顶部标题
+
     Scaffold(
+        topBar = {
+            TopBar(title = topBarTitle) // 显示顶部导航栏
+        },
         bottomBar = {
             BottomNavigationBar(selectedScreen) { screen ->
                 selectedScreen = screen
+                // 更新 topBarTitle
+                topBarTitle = when (screen) {
+                    ScreenPage.Home -> "首页"
+                    ScreenPage.Love -> "收藏"
+                    ScreenPage.Capture -> "Capture"
+                    ScreenPage.Message -> "消息"
+                    ScreenPage.Mine -> "我的信息"
+                }
             }
         }
     ) { paddingValues ->
@@ -133,6 +146,16 @@ fun MainContent() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(title: String) {
+    TopAppBar(
+        title = { Text(text =title) },
+    )
+}
+
+
+
 @Composable
 fun BottomNavigationBar(selectedScreen: ScreenPage, onScreenSelected: (ScreenPage) -> Unit) {
     BottomNavigation {
@@ -147,8 +170,9 @@ fun BottomNavigationBar(selectedScreen: ScreenPage, onScreenSelected: (ScreenPag
                     icon = { color -> // 接受颜色参数
                         Icon(
                             painter = painterResource(id = screen.iconSelect),
-                            contentDescription = stringResource(id = screen.resId),
-                            modifier = Modifier.size(24.dp),
+                            contentDescription = if (screen.resId != 0) stringResource(id = screen.resId) else null,
+                            modifier = if (screen.resId != 0) Modifier.size(24.dp) else Modifier.size(40.dp),
+
                             tint = color // 使用传递的颜色
                         )
                     },

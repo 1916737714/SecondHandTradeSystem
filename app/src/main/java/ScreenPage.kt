@@ -24,7 +24,7 @@ sealed class ScreenPage(
 
     object Capture : ScreenPage(
         route = "add",
-        resId = R.string.str_main_title_add,//不修改为空，app闪退，资源未找到
+        //resId = R.string.str_main_title_add,//不修改为空，app闪退，资源未找到
         iconSelect = R.drawable.add,
         iconUnselect = R.drawable.add,
         isShowText = false
