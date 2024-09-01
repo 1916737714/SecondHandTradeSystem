@@ -1,5 +1,6 @@
+package com.example.andoirdsecondhandtradingsystem
+
 import androidx.annotation.StringRes
-import com.example.andoirdsecondhandtradingsystem.R
 
 sealed class ScreenPage(
     val route: String,

@@ -41,13 +41,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 
 class Register {
-    
+
+
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("NotConstructor")
     @Composable
-    fun Register(modifier: Modifier = Modifier,onRegisterSuccess:()->Unit){
+    fun Register(modifier: Modifier = Modifier,
+                 onRegisterSuccess:()->Unit,
+//                 onError: (String) -> Unit,
+                 ){
         //获取到内容
         var Account by remember { mutableStateOf("") }
         var Firstpwd by remember { mutableStateOf("") }
@@ -143,7 +150,13 @@ class Register {
                         .background(gradientBrush) // 渐变背景
                 ) {
                     Button(
-                        onClick = { /*TODO*/onRegisterSuccess ()},
+                        onClick = { /*TODO*/
+//                            if (Firstpwd == Secondpwd) {
+//                            viewModel.registerUser(Account, Firstpwd, onRegisterSuccess, onError)
+//                        } else {
+//                            onError("两次输入的密码不一致")
+//                        }
+                                  },
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)

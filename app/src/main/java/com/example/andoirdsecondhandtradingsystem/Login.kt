@@ -2,6 +2,7 @@ package com.example.andoirdsecondhandtradingsystem
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -143,6 +144,7 @@ class Login(private val context: Context) {
                     Button(
                         onClick = {
                             // 如果选中了记住密码，则保存数据到 DataStore
+                            Log.d("Login", "Remember User: $rememberUser") // 添加日志
                             if (rememberUser) {
                                 coroutineScope.launch {
                                     context.dataStore.edit { preferences ->
@@ -162,6 +164,7 @@ class Login(private val context: Context) {
                                 }
                             }
                             // TODO: 添加登录功能
+
                             onLoginSuccess()
 
                         },

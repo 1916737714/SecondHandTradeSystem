@@ -60,9 +60,13 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-//    implementation(libs.androidx.datastore.core.android)
-//    implementation(libs.androidx.datastore.preferences.core.jvm)
-    implementation("androidx.datastore:datastore-preferences:1.1.1") // 或根据 libs.versions.toml
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0-alpha01")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
