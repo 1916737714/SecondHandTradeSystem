@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,12 +54,17 @@ class Register {
     @Composable
     fun Register(modifier: Modifier = Modifier,
                  onRegisterSuccess:()->Unit,
-//                 onError: (String) -> Unit,
+                 onError: (String) -> Unit,
+                 viewModel: AuthViewModel = AuthViewModel()
                  ){
+
         //获取到内容
         var Account by remember { mutableStateOf("") }
         var Firstpwd by remember { mutableStateOf("") }
         var Secondpwd by remember { mutableStateOf("") }
+        var isDialogVisible by remember { mutableStateOf(false) }
+        var dialogMessage by remember { mutableStateOf("") }
+
         //控制眼睛变化
         val pwdVisualTransformation = PasswordVisualTransformation()
         var showPwd by remember { mutableStateOf(true) }
@@ -151,11 +157,19 @@ class Register {
                 ) {
                     Button(
                         onClick = { /*TODO*/
-//                            if (Firstpwd == Secondpwd) {
-//                            viewModel.registerUser(Account, Firstpwd, onRegisterSuccess, onError)
-//                        } else {
-//                            onError("两次输入的密码不一致")
-//                        }
+                                    if (Firstpwd == Secondpwd) {
+                                        viewModel.registerUser(Account, Firstpwd, onSuccess = {
+                                            dialogMessage = "注册成功"
+                                            isDialogVisible = true // 显示成功弹窗
+                                            onRegisterSuccess()
+                                        }, onError = { errorMessage ->
+                                            dialogMessage = errorMessage
+                                            isDialogVisible = true // 显示错误弹窗
+                                        })
+                                    } else {
+                                        dialogMessage = "两次输入的密码不一致"
+                                        isDialogVisible = true // 显示错误弹窗
+                                    }
                                   },
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(8.dp),
@@ -164,6 +178,25 @@ class Register {
                         Text("注册", color = Color.White, fontSize = 24.sp)
                     }
                 }
+                // 弹窗显示逻辑
+                if (isDialogVisible) {
+                    AlertDialog(
+                        onDismissRequest = { isDialogVisible = false },
+                        title = { Text(text = "提示") },
+                        text = { Text(dialogMessage, fontSize = 24.sp) },
+                        confirmButton = {
+                            Button(
+                                onClick = { isDialogVisible = false
+                                    onRegisterSuccess() }
+                            ) {
+                                Text("确定",)
+                            }
+                        },
+                        dismissButton = null
+                    )
+                }
+
+
             }
         }
     }   

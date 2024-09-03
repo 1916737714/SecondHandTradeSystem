@@ -77,7 +77,11 @@ class MainActivity : ComponentActivity() {
                             exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(animationSpec = tween(300))
                         ) {
                             register.Register(modifier = Modifier.fillMaxSize(),
-                                onRegisterSuccess = {currentScreen = "Login"})
+                                onRegisterSuccess = {currentScreen = "Login"},
+                                onError = { errorMessage ->
+                                    // 处理错误，例如显示一个 SnackBar
+                                    println("注册失败: $errorMessage")
+                                })
                         }
                     }
                 }

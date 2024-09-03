@@ -65,6 +65,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0-alpha01")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3") // 确保使用合适的版本
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
 
 
 

@@ -44,10 +44,16 @@ class Login(private val context: Context) {
     @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("NotConstructor")
     @Composable
-    fun Login(modifier: Modifier = Modifier, onRegisterClick: () -> Unit,onLoginSuccess: () -> Unit) {
+    fun Login(modifier: Modifier = Modifier,
+              onRegisterClick: () -> Unit,
+              onLoginSuccess: () -> Unit,
+              viewModel: AuthViewModel = AuthViewModel()
+    ) {
         var name by remember { mutableStateOf("") } // 用户名状态
         var pwd by remember { mutableStateOf("") } // 密码状态
         var rememberUser by remember { mutableStateOf(false) } // 记住密码状态
+        var isDialogVisible by remember { mutableStateOf(false) }
+        var dialogMessage by remember { mutableStateOf("") }
 
         // Coroutine scope 用于启动协程
         val coroutineScope = rememberCoroutineScope()
@@ -164,6 +170,7 @@ class Login(private val context: Context) {
                                 }
                             }
                             // TODO: 添加登录功能
+
 
                             onLoginSuccess()
 

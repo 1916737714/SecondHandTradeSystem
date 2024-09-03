@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 data class ApiResponse(
     @SerializedName("msg") val msg: String,
     @SerializedName("code") val code: Int,
-    @SerializedName("data") val data: Data
+    @SerializedName("data") val data: Data?
 )
 
 // 使用 sealed class 来表示不同类型的 "data"
