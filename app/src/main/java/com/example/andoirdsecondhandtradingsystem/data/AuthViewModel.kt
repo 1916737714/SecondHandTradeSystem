@@ -1,4 +1,4 @@
-package com.example.andoirdsecondhandtradingsystem
+package com.example.andoirdsecondhandtradingsystem.data
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -14,6 +14,11 @@ class AuthViewModel : ViewModel() {
         RetrofitClient.instance.create(ApiService::class.java)
     }
 
+
+
+    /**
+     * 注册用户
+     */
     fun registerUser(
         username: String,
         password: String,
@@ -53,6 +58,9 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 登录用户
+     */
     fun loginUser(
         username: String,
         password: String,
@@ -61,7 +69,9 @@ class AuthViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                val response = apiService.loginUser(LoginRequest(username, password)).execute()
+                val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
+                    apiService.loginUser(LoginRequest(username, password)).execute()
+                }
                 if (response.isSuccessful) {
                     val apiResponse = response.body()
                     if (apiResponse != null && apiResponse.code == 0) {

@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.*
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,7 +41,6 @@ class MainActivity : ComponentActivity() {
                 val register = Register()
                 var currentScreen by remember { mutableStateOf("Login") }
 
-
                 var isLoggedIn by remember { mutableStateOf(false) }
 
                 //回退
@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if(isLoggedIn) {
+
                     MainContent()
                 }else
                 {
@@ -67,7 +68,7 @@ class MainActivity : ComponentActivity() {
                                     currentScreen = "Register"
                                 },
                                 onLoginSuccess = {
-                                    isLoggedIn = true // 更新登录状态
+                                    isLoggedIn = true// 更新登录状态
                                 })
                         }
                         //注册
@@ -90,160 +91,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun RegisterPreview() {
-//    AndoirdSecondHandTradingSystemTheme {
-//        val register = Register()
-//        register.Register(onRegisterSuccess = {})
-//    }
-//}
-
-//底部导航栏
-@Composable
-fun MainContent() {
-    var selectedScreen by remember { mutableStateOf<ScreenPage>(ScreenPage.Home) }
-
-    var topBarTitle by remember { mutableStateOf("Home") }  // 用于存储顶部标题
-
-    Scaffold(
-        topBar = {
-            TopBar(title = topBarTitle) // 显示顶部导航栏
-        },
-        bottomBar = {
-            BottomNavigationBar(selectedScreen) { screen ->
-                selectedScreen = screen
-                // 更新 topBarTitle
-                topBarTitle = when (screen) {
-                    ScreenPage.Home -> "首页"
-                    ScreenPage.Love -> "收藏"
-                    ScreenPage.Capture -> "Capture"
-                    ScreenPage.Message -> "消息"
-                    ScreenPage.Mine -> "我的信息"
-                }
-            }
-        }
-    ) { paddingValues ->
-        // 显示当前选择的屏幕内容
-        Column(
-            modifier = Modifier
-                .padding(bottom = paddingValues.calculateBottomPadding()) // 确保底部有足够的空间
-                .fillMaxSize()
-                .navigationBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            when (selectedScreen) {
-                is ScreenPage.Home -> Text(text = "Home Screen")
-                is ScreenPage.Love -> Text(text = "Love Screen")
-                is ScreenPage.Capture -> Text(text = "Capture Screen")
-                is ScreenPage.Message -> Text(text = "Message Screen")
-                is ScreenPage.Mine -> Text(text = "Mine Screen")
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TopBar(title: String) {
-    TopAppBar(
-        title = { Text(text =title) },
-    )
-}
-
-
-
-@Composable
-fun BottomNavigationBar(selectedScreen: ScreenPage, onScreenSelected: (ScreenPage) -> Unit) {
-    BottomNavigation {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            val screens = listOf(ScreenPage.Home, ScreenPage.Love, ScreenPage.Capture, ScreenPage.Message, ScreenPage.Mine)
-
-            screens.forEach { screen ->
-                BottomNavigationItem(
-                    icon = { color -> // 接受颜色参数
-                        Icon(
-                            painter = painterResource(id = screen.iconSelect),
-                            contentDescription = if (screen.resId != 0) stringResource(id = screen.resId) else null,
-                            modifier = if (screen.resId != 0) Modifier.size(24.dp) else Modifier.size(40.dp),
-
-                            tint = color // 使用传递的颜色
-                        )
-                    },
-                    label = {
-                        // 只有当 resId 不是 0 时才显示标签
-                        if (screen.resId != 0) {
-                            Text(text = stringResource(id = screen.resId))
-                        }
-                    },
-                    selected = screen == selectedScreen,
-                    onClick = { onScreenSelected(screen) },
-                    alwaysShowLabel = screen.isShowText // 根据 isShowText 决定是否显示标签
-                )
-            }
-        }
-    }
-}
-
-
-
-@SuppressLint("RememberReturnType")
-@Composable
-fun BottomNavigationItem(
-    icon: @Composable (androidx.compose.ui.graphics.Color) -> Unit,
-    label: @Composable () -> Unit,
-    selected: Boolean,
-    onClick: () -> Unit,
-    alwaysShowLabel: Boolean
-) {
-//    val contentColor = if (selected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface
-    // 背景颜色：选中时为黄色，未选中时黑
-    val contentColor = if (selected) Color(0xFFFFD700) else Color(0xFF000000)
-
-    Box(
-        modifier = Modifier
-            .clickable(onClick = onClick,
-                indication = null, // 这里取消点击效果的指示器
-                interactionSource = remember { MutableInteractionSource() } // 取消点击时的阴影效果
-                )
-//            .background(backgroundColor)
-
-            .padding(8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            icon(contentColor) // 显示图标
-            if (alwaysShowLabel || selected) {
-                label() // 显示标签
-            }
-        }
-    }
-}
-
-@Composable
-fun BottomNavigation(content: @Composable () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-//            .background(MaterialTheme.colorScheme.primary)
-            .background(androidx.compose.ui.graphics.Color.Transparent)
-            .navigationBarsPadding()//调整底部导航栏在虚拟操作栏上方
-
-
-    ) {
-
-        content()
-    }
-}
-
-
-
-
-
 
 @Preview(showBackground = true)
 @Composable
@@ -253,39 +100,3 @@ fun PreviewMainContent() {
     }
 }
 
-
-
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun MyApp() {
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(title = { Text("My App") })
-//        },
-//        bottomBar = {
-//            BottomAppBar {
-//                Text("Bottom Bar")
-//            }
-//        },
-//        content = { paddingValues ->
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(paddingValues),
-//                verticalArrangement = Arrangement.Center,
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                Text("Hello World!")
-//            }
-//        }
-//    )
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun Preview() {
-//    AndoirdSecondHandTradingSystemTheme {
-//        MyApp()
-//    }
-//}

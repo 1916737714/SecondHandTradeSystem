@@ -1,4 +1,4 @@
-package com.example.andoirdsecondhandtradingsystem
+package com.example.andoirdsecondhandtradingsystem.data
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder

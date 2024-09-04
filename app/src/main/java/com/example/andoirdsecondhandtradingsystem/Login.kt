@@ -3,6 +3,7 @@ package com.example.andoirdsecondhandtradingsystem
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,6 +30,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.andoirdsecondhandtradingsystem.data.AuthViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -52,8 +54,6 @@ class Login(private val context: Context) {
         var name by remember { mutableStateOf("") } // 用户名状态
         var pwd by remember { mutableStateOf("") } // 密码状态
         var rememberUser by remember { mutableStateOf(false) } // 记住密码状态
-        var isDialogVisible by remember { mutableStateOf(false) }
-        var dialogMessage by remember { mutableStateOf("") }
 
         // Coroutine scope 用于启动协程
         val coroutineScope = rememberCoroutineScope()
@@ -170,7 +170,18 @@ class Login(private val context: Context) {
                                 }
                             }
                             // TODO: 添加登录功能
-
+                            // 调用登录方法
+                            viewModel.loginUser(
+                                username = name,
+                                password = pwd,
+                                onSuccess = {
+                                    Toast.makeText(context, "登录成功", Toast.LENGTH_SHORT).show()
+                                    onLoginSuccess()
+                                },
+                                onError = { errorMessage ->
+                                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                                }
+                            )
 
                             onLoginSuccess()
 

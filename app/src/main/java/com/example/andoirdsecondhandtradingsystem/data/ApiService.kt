@@ -1,9 +1,7 @@
-package com.example.andoirdsecondhandtradingsystem
+package com.example.andoirdsecondhandtradingsystem.data
 
-import com.example.andoirdsecondhandtradingsystem.ApiResponse
 import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.Headers
 import retrofit2.http.POST
 //api  接口
 interface ApiService {
