@@ -59,12 +59,23 @@ fun MainContent() {
                     is ScreenPage.Home -> Text(text = "Home Screen")
                     is ScreenPage.Love -> Text(text = "Love Screen")
                     is ScreenPage.Capture -> Text(text = "Capture Screen")
-                    is ScreenPage.Message ->  AppNavigation(navController)
+                    is ScreenPage.Message ->  AppNavigation(navController, selectedScreen)
 //                        MessageScreen(navController)
                     is ScreenPage.Mine -> Text(text = "Mine Screen")
                 }
             }
         }
+
+        // 显示当前选择的屏幕内容
+//        Box(modifier = Modifier.padding(paddingValues)) {
+//            Column(
+//                modifier = Modifier.fillMaxSize(),
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Arrangement.Center
+//            ) {
+//                AppNavigation(navController, selectedScreen)
+//            }
+//        }
 
     }
 }

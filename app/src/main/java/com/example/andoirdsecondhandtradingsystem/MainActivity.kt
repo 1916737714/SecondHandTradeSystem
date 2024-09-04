@@ -26,6 +26,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 import com.example.andoirdsecondhandtradingsystem.ui.theme.AndoirdSecondHandTradingSystemTheme
 
@@ -38,7 +40,6 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             AndoirdSecondHandTradingSystemTheme {
-
                 val login = Login(context = this)
                 val register = Register()
                 var currentScreen by remember { mutableStateOf("Login") }
@@ -93,11 +94,5 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewMainContent() {
-    AndoirdSecondHandTradingSystemTheme {
-        MainContent()
-    }
-}
+
 
