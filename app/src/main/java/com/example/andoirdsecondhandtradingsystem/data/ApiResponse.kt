@@ -69,6 +69,7 @@ sealed class Data {
         @SerializedName("sellerName") val sellerName: String
     ) : Data()
 
+    //登录post请求后获取到的信息字段
     data class User(
         @SerializedName("appKey") val appKey: String,
         @SerializedName("avatar") val avatar: String,

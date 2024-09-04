@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
+
 
 
 //底部导航栏
@@ -24,10 +26,11 @@ import androidx.compose.ui.unit.dp
 fun MainContent() {
     var selectedScreen by remember { mutableStateOf<ScreenPage>(ScreenPage.Home) }
     var topBarTitle by remember { mutableStateOf("Home") }  // 用于存储顶部标题
+    val navController = rememberNavController()
 
     Scaffold(
         topBar = {
-            TopBar(title = topBarTitle) // 显示顶部导航栏
+            TopBar(title = topBarTitle)// 显示顶部导航栏
         },
         bottomBar = {
             BottomNavigationBar(selectedScreen) { screen ->
@@ -44,22 +47,25 @@ fun MainContent() {
         }
     ) { paddingValues ->
         // 显示当前选择的屏幕内容
-        Column(
-            modifier = Modifier
-                .padding(bottom = paddingValues.calculateBottomPadding()) // 确保底部有足够的空间
-                .fillMaxSize()
-                .navigationBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            when (selectedScreen) {
-                is ScreenPage.Home -> Text(text = "Home Screen")
-                is ScreenPage.Love -> Text(text = "Love Screen")
-                is ScreenPage.Capture -> Text(text = "Capture Screen")
-                is ScreenPage.Message -> Text(text = "Message Screen")
-                is ScreenPage.Mine -> Text(text = "Mine Screen")
+        Box(modifier = Modifier.padding(paddingValues))
+        {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                when (selectedScreen) {
+                    is ScreenPage.Home -> Text(text = "Home Screen")
+                    is ScreenPage.Love -> Text(text = "Love Screen")
+                    is ScreenPage.Capture -> Text(text = "Capture Screen")
+                    is ScreenPage.Message ->  AppNavigation(navController)
+//                        MessageScreen(navController)
+                    is ScreenPage.Mine -> Text(text = "Mine Screen")
+                }
             }
         }
+
     }
 }
 
@@ -68,6 +74,9 @@ fun MainContent() {
 fun TopBar(title: String) {
     TopAppBar(
         title = { Text(text = title) },
+        //修改颜色
+//        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0x9EC2ADE7))
+
     )
 }
 
@@ -121,8 +130,7 @@ fun BottomNavigationItem(
             .clickable(onClick = onClick,
                 indication = null, // 这里取消点击效果的指示器
                 interactionSource = remember { MutableInteractionSource() } // 取消点击时的阴影效果
-            )
-            .padding(8.dp),
+            ),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -67,6 +67,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation ("com.squareup.okhttp3:okhttp:4.9.3") // 确保使用合适的版本
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    implementation(libs.androidx.navigation.compose)
 
 
 

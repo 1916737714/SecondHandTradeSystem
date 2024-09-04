@@ -36,7 +36,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
             AndoirdSecondHandTradingSystemTheme {
+
                 val login = Login(context = this)
                 val register = Register()
                 var currentScreen by remember { mutableStateOf("Login") }
@@ -49,7 +51,6 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if(isLoggedIn) {
-
                     MainContent()
                 }else
                 {
