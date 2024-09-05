@@ -22,34 +22,24 @@ import androidx.navigation.compose.rememberNavController
 // 数据类
 data class Message(val id: Int, val content: String)
 
-//@Composable
-//fun AppNavigation(navController: NavHostController) {
-//    val navController = rememberNavController()
-//    NavHost(navController, startDestination = "message_screen") {
-//        composable("message_screen") { MessageScreen(navController) }
-//        composable("chat_screen/{messageId}") { backStackEntry ->
-//            val messageId = backStackEntry.arguments?.getString("messageId")?.toIntOrNull()
-//            messageId?.let { ChatScreen(it) }
-//        }
-//    }
-//}
-
 @Composable
-fun AppNavigation(navController: NavHostController, selectedScreen: ScreenPage) {
+fun AppNavigation(navController: NavHostController, selectedScreen: ScreenPage,onShowBarsChanged: (Boolean) -> Unit) {
     NavHost(navController, startDestination = "message_screen") {
         composable("message_screen") {
             if (selectedScreen == ScreenPage.Message) {
+                onShowBarsChanged(true) // 在MessageScreen中显示bars
                 MessageScreen(navController)
             }
         }
         composable("chat_screen/{messageId}") { backStackEntry ->
             val messageId = backStackEntry.arguments?.getString("messageId")?.toIntOrNull()
-            messageId?.let { ChatScreen(it) }
+            messageId?.let {
+                onShowBarsChanged(false) // 在MessageScreen中隐藏bars
+                ChatScreen(it,navController) }
         }
 
     }
 }
-
 
 @Composable
 fun MessageScreen(navController: NavController) {

@@ -67,7 +67,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation ("com.squareup.okhttp3:okhttp:4.9.3") // 确保使用合适的版本
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.compose)//导航
+
+    implementation ("androidx.emoji2:emoji2-emojipicker:1.4.0-beta05")
+    implementation(libs.androidx.emoji2.bundled)//表情包
+
 
 
 

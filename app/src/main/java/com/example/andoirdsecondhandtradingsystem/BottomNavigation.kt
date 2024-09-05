@@ -27,21 +27,27 @@ fun MainContent() {
     var selectedScreen by remember { mutableStateOf<ScreenPage>(ScreenPage.Home) }
     var topBarTitle by remember { mutableStateOf("Home") }  // 用于存储顶部标题
     val navController = rememberNavController()
+    var showBars by remember { mutableStateOf(true) } // 控制topBar和bottomBar的显示
 
     Scaffold(
         topBar = {
-            TopBar(title = topBarTitle)// 显示顶部导航栏
+            if(showBars){
+                TopBar(title = topBarTitle)// 显示顶部导航栏
+            }
+
         },
         bottomBar = {
-            BottomNavigationBar(selectedScreen) { screen ->
-                selectedScreen = screen
-                // 更新 topBarTitle
-                topBarTitle = when (screen) {
-                    ScreenPage.Home -> "首页"
-                    ScreenPage.Love -> "收藏"
-                    ScreenPage.Capture -> "Capture"
-                    ScreenPage.Message -> "消息"
-                    ScreenPage.Mine -> "我的信息"
+            if (showBars) {
+                BottomNavigationBar(selectedScreen) { screen ->
+                    selectedScreen = screen
+                    // 更新 topBarTitle
+                    topBarTitle = when (screen) {
+                        ScreenPage.Home -> "首页"
+                        ScreenPage.Love -> "收藏"
+                        ScreenPage.Capture -> "Capture"
+                        ScreenPage.Message -> "消息"
+                        ScreenPage.Mine -> "我的信息"
+                    }
                 }
             }
         }
@@ -55,30 +61,20 @@ fun MainContent() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+
+            }
                 when (selectedScreen) {
-                    is ScreenPage.Home -> Text(text = "Home Screen")
-                    is ScreenPage.Love -> Text(text = "Love Screen")
-                    is ScreenPage.Capture -> Text(text = "Capture Screen")
-                    is ScreenPage.Message ->  AppNavigation(navController, selectedScreen)
-//                        MessageScreen(navController)
-                    is ScreenPage.Mine -> Text(text = "Mine Screen")
-                }
+                is ScreenPage.Home -> Text(text = "Home Screen")
+                is ScreenPage.Love -> Text(text = "Love Screen")
+                is ScreenPage.Capture -> Text(text = "Capture Screen")
+                is ScreenPage.Message ->  AppNavigation(navController, selectedScreen){showBars = it}
+    //                        MessageScreen(navController)
+                is ScreenPage.Mine -> Text(text = "Mine Screen")
             }
         }
-
-        // 显示当前选择的屏幕内容
-//        Box(modifier = Modifier.padding(paddingValues)) {
-//            Column(
-//                modifier = Modifier.fillMaxSize(),
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                verticalArrangement = Arrangement.Center
-//            ) {
-//                AppNavigation(navController, selectedScreen)
-//            }
-//        }
-
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
