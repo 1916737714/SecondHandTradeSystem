@@ -1,4 +1,4 @@
-package com.example.andoirdsecondhandtradingsystem
+package com.example.andoirdsecondhandtradingsystem.Message
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,13 +17,14 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.example.andoirdsecondhandtradingsystem.R
+import com.example.andoirdsecondhandtradingsystem.ScreenPage
 
 // 数据类
 data class Message(val id: Int, val content: String)
 
 @Composable
-fun AppNavigation(navController: NavHostController, selectedScreen: ScreenPage,onShowBarsChanged: (Boolean) -> Unit) {
+fun AppNavigation(navController: NavHostController, selectedScreen: ScreenPage, onShowBarsChanged: (Boolean) -> Unit) {
     NavHost(navController, startDestination = "message_screen") {
         composable("message_screen") {
             if (selectedScreen == ScreenPage.Message) {
@@ -83,7 +84,7 @@ fun MessageScreen(navController: NavController) {
 }
 
 @Composable
-fun MessageItem(message: Message,onMessageClick: (Int) -> Unit) {
+fun MessageItem(message: Message, onMessageClick: (Int) -> Unit) {
     Box(modifier = Modifier
         .fillMaxWidth()
         .clickable { onMessageClick(message.id) })

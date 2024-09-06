@@ -18,7 +18,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-
+import com.example.andoirdsecondhandtradingsystem.Goods.GoodsManage
+import com.example.andoirdsecondhandtradingsystem.Message.AppNavigation
 
 
 //底部导航栏
@@ -66,7 +67,7 @@ fun MainContent() {
                 when (selectedScreen) {
                 is ScreenPage.Home -> Text(text = "Home Screen")
                 is ScreenPage.Love -> Text(text = "Love Screen")
-                is ScreenPage.Capture -> Text(text = "Capture Screen")
+                is ScreenPage.Capture -> GoodsManage()
                 is ScreenPage.Message ->  AppNavigation(navController, selectedScreen){showBars = it}
     //                        MessageScreen(navController)
                 is ScreenPage.Mine -> Text(text = "Mine Screen")
