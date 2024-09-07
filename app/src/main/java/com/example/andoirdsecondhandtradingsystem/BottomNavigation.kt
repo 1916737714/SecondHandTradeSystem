@@ -45,7 +45,7 @@ fun MainContent() {
                     topBarTitle = when (screen) {
                         ScreenPage.Home -> "首页"
                         ScreenPage.Love -> "收藏"
-                        ScreenPage.Capture -> "Capture"
+                        ScreenPage.Capture -> "商品管理"
                         ScreenPage.Message -> "消息"
                         ScreenPage.Mine -> "我的信息"
                     }
