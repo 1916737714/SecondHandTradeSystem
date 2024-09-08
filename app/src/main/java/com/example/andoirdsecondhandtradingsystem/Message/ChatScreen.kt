@@ -206,7 +206,7 @@ fun ChatInputBar(onSend: (StaticMessage) -> Unit) {
                     .weight(1f)
                     .height(56.dp)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .background(Color.LightGray, RoundedCornerShape(28.dp)), // 设置背景和圆角
+                    .background(Color.White, RoundedCornerShape(28.dp)), // 设置背景和圆角
                 textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp), // 设置文本样式
                 decorationBox = { innerTextField ->
                     Box(

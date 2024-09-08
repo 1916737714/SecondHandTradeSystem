@@ -1,5 +1,6 @@
 package com.example.andoirdsecondhandtradingsystem.Message
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -96,22 +97,32 @@ fun MessageItem(message: Message, onMessageClick: (Int) -> Unit) {
         ) {
             Box(modifier = Modifier.size(64.dp))
             {
+                //图片
                 Image(painter = painterResource(id = R.drawable.image5),
                     contentDescription = null,
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
                 )
+                //红点
+                Box(
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clip(CircleShape)
+                        .background(Color.Red)
+                        .align(Alignment.TopEnd)  // 将红点定位在右上角
+                        .offset(x = 4.dp, y = (-4).dp) // 可选：根据需要调整红点的位置
+                )
             }
-            Spacer(modifier = Modifier.width(8.dp))
 
+            Spacer(modifier = Modifier.width(8.dp))
+            //聊天简介
             Column {
                 Row {
                     Column (modifier = Modifier.weight(1f)){
                         Text(text = "Message ID: ${message.id}")
                         Text(text = message.content)
                         Text(text = "date")
-
                     }
                     Box(modifier = Modifier.size(64.dp))
                     {

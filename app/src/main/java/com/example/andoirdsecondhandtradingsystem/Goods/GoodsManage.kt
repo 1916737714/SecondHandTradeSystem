@@ -13,6 +13,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 
 import androidx.compose.foundation.layout.Spacer
@@ -26,16 +27,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -86,6 +96,7 @@ fun GoodsManage(){
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PublishProductScreen() {
     var productName by remember { mutableStateOf("") }
@@ -108,6 +119,12 @@ fun PublishProductScreen() {
             }
         }
     }
+    Column (modifier = Modifier
+        .fillMaxSize()
+        .padding(12.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
 
     Card(
         modifier = Modifier
@@ -130,7 +147,7 @@ fun PublishProductScreen() {
                 Box(
                     modifier = Modifier
                         .size(100.dp, 100.dp)
-                        .background(Color.Gray)
+                        .background(Color.White)
                         .clickable {
                             val intent =
                                 Intent(
@@ -149,7 +166,7 @@ fun PublishProductScreen() {
                         )
                     } ?: run {
                         Icon(
-                            painter = painterResource(id = R.drawable.image5),
+                            painter = painterResource(id = R.drawable.add_1),
                             contentDescription = null,
                             modifier = Modifier.align(Alignment.Center)
                         )
@@ -170,7 +187,8 @@ fun PublishProductScreen() {
                     onValueChange = { productDescription = it },
                     modifier = Modifier
                         .weight(1f)
-                        .background(Color.LightGray)
+                        .height(100.dp)
+                        .background(Color.White, RoundedCornerShape(8.dp))
                         .padding(8.dp),
                     textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
@@ -178,6 +196,31 @@ fun PublishProductScreen() {
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            // 商品名称
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("商品名称", style = MaterialTheme.typography.bodyLarge)
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                BasicTextField(
+                    value = productName,
+                    onValueChange = { productName = it },
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .padding(8.dp),
+                    textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+                )
+
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
 
             // 商品价格
             Row(
@@ -189,8 +232,8 @@ fun PublishProductScreen() {
                     value = productPrice,
                     onValueChange = { productPrice = it },
                     modifier = Modifier
-                        .weight(1f)
-                        .background(Color.LightGray)
+                        .width(100.dp)
+                        .background(Color.White, RoundedCornerShape(8.dp))
                         .padding(8.dp),
                     textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
                     keyboardOptions = KeyboardOptions.Default.copy(
@@ -209,26 +252,6 @@ fun PublishProductScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 商品名称
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("商品名称", style = MaterialTheme.typography.bodyLarge)
-                Spacer(modifier = Modifier.width(16.dp))
-                BasicTextField(
-                    value = productName,
-                    onValueChange = { productName = it },
-                    modifier = Modifier
-                        .weight(1f)
-                        .background(Color.LightGray)
-                        .padding(8.dp),
-                    textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             // 商品类型
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -238,17 +261,17 @@ fun PublishProductScreen() {
                 var expandedType by remember { mutableStateOf(false) }
                 val categories = listOf("类型1", "类型2", "类型3", "类型4", "类型5")
                 Box {
-                    BasicTextField(
-                        value = productType,
-                        onValueChange = { productType = it },
-                        modifier = Modifier
-
-                            .background(Color.LightGray)
-                            .padding(8.dp)
-                            .clickable { expandedType = true },
-                        textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                        readOnly = true
-                    )
+//                    BasicTextField(
+//                        value = productType,
+//                        onValueChange = { productType = it },
+//                        modifier = Modifier
+//
+//                            .background(Color.White)
+//                            .padding(8.dp)
+//                            .clickable { expandedType = true },
+//                        textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+//                        readOnly = true
+//                    )
                     DropdownMenu(
                         expanded = expandedType,
                         onDismissRequest = { expandedType = false }
@@ -268,71 +291,109 @@ fun PublishProductScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            var productLocation by remember { mutableStateOf("") }
+            var expandedLocation by remember { mutableStateOf(false) }
+            val locations = listOf("北京", "上海", "广州", "深圳", "杭州")
+
             // 商品所在地
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("商品所在地", style = MaterialTheme.typography.bodyLarge)
+                Text("商品地址", style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.width(16.dp))
-                var expandedLocation by remember { mutableStateOf(false) }
-                val locations = listOf("北京", "上海", "广州", "深圳", "杭州")
-                Box {
-                    BasicTextField(
-                        value = productLocation,
-                        onValueChange = { productLocation = it },
-                        modifier = Modifier
 
-                            .background(Color.LightGray)
-                            .padding(8.dp)
-                            .clickable { expandedLocation = true },
+                Box {
+                    TextField(
+                        value = productLocation,
+                        onValueChange = {},
+                        modifier = Modifier
+                            .clickable { expandedLocation = true }
+                            .background(Color.White)
+                            .width(100.dp)
+                            .height(40.dp)
+                            .padding(8.dp),
                         textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                        readOnly = true
+                        readOnly = true,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                tint = Color.Black
+                            )
+                        },
+
                     )
+
                     DropdownMenu(
                         expanded = expandedLocation,
                         onDismissRequest = { expandedLocation = false }
                     ) {
                         locations.forEach { location ->
                             DropdownMenuItem(
+                                text = { Text(location) },
                                 onClick = {
                                     productLocation = location
                                     expandedLocation = false
-                                },
-                                text = { Text(location) }
+                                }
                             )
                         }
                     }
                 }
             }
-        }
-            Spacer(modifier = Modifier.height(16.dp))
 
-            // 操作按钮
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
+
+
+
+
+
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+
+
+
+
+    // 操作按钮
+
+        val gradientBrush = Brush.horizontalGradient(colors = listOf(Color(0xFFFFEB3B), Color(0xFFFF9800))) // 渐变背景
+
+
+    Row(
+        horizontalArrangement = Arrangement.Center,
+//        modifier = Modifier.fillMaxWidth()
+    ) {
+        OutlinedButton(
+            onClick = {
+                // Handle later publish
+            },
+            modifier = Modifier
+                .width(128.dp)
+                .height(48.dp)
+                .padding(end = 16.dp) // 调整间距以确保两个按钮之间有适当的空隙
+        ) {
+            Text("稍后发布", color = Color.Black, fontSize = 14.sp)
+        }
+
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50)) // 圆角
+                .background(gradientBrush) // 渐变背景
+                .width(128.dp)
+                .height(48.dp)
+        ) {
+            Button(
+                onClick = {
+                    // Handle immediate publish
+                },
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(0.dp),
+                colors = ButtonDefaults.buttonColors(Color.Transparent)
             ) {
-                Button(
-                    onClick = {
-                        // Handle later publish
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp) // 调整间距以确保两个按钮之间有适当的空隙
-                ) {
-                    Text("稍后发布")
-                }
-                Button(
-                    onClick = {
-                        // Handle immediate publish
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("立即发布")
+                Text("立即发布", color = Color.Black, fontSize = 16.sp)
                 }
             }
         }
-
+    }
 }
 
 @Preview(showBackground = true)
