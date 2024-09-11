@@ -1,4 +1,4 @@
-package com.example.andoirdsecondhandtradingsystem
+package com.example.andoirdsecondhandtradingsystem.Message
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,16 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
 import androidx.emoji2.emojipicker.EmojiPickerView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.andoirdsecondhandtradingsystem.R
 import kotlinx.coroutines.launch
 
 // 数据类定义
@@ -190,7 +191,7 @@ fun ChatInputBar(onSend: (StaticMessage) -> Unit) {
     var messageText by remember { mutableStateOf("") }
     var messageId by remember { mutableStateOf(11) } // 初始消息ID
     var isEmojiPanelVisible by remember { mutableStateOf(false) }
-
+    val keyboardController = LocalSoftwareKeyboardController.current
     Column {
         Row(
             modifier = Modifier
@@ -205,7 +206,7 @@ fun ChatInputBar(onSend: (StaticMessage) -> Unit) {
                     .weight(1f)
                     .height(56.dp)
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .background(Color.LightGray, RoundedCornerShape(28.dp)), // 设置背景和圆角
+                    .background(Color.White, RoundedCornerShape(28.dp)), // 设置背景和圆角
                 textStyle = TextStyle(color = Color.Gray, fontSize = 16.sp), // 设置文本样式
                 decorationBox = { innerTextField ->
                     Box(
@@ -249,7 +250,8 @@ fun ChatInputBar(onSend: (StaticMessage) -> Unit) {
                         Text("发送")
                     }
                 } else {
-                    IconButton(onClick = { isEmojiPanelVisible = !isEmojiPanelVisible }) {
+                    IconButton(onClick = { isEmojiPanelVisible = !isEmojiPanelVisible
+                        keyboardController?.hide()}) {
                         Icon(
                             painter = painterResource(id = R.drawable.emoji),
                             contentDescription = "Emoji",
@@ -287,10 +289,10 @@ fun EmojiPicker(onEmojiSelected: (String) -> Unit) {
 }
 
 
-
 @Preview(showBackground = true)
 @Composable
 fun ChatScreenPreview() {
     val navController = rememberNavController()
     ChatScreen(messageId = 1,navController)
 }
+
