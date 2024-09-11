@@ -2,6 +2,7 @@ package com.example.andoirdsecondhandtradingsystem.data
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 //api  接口
 interface ApiService {
@@ -13,6 +14,10 @@ interface ApiService {
 
     @POST("api/member/tran/user/login")
     fun loginUser(@Body loginRequest: LoginRequest): Call<ApiResponse>
+
+
+    @GET("api/member/tran/chat/user")
+    fun getMessageList(@Body messageListRequest: MessageListRequest): Call<ApiResponse>
 }
 
 data class RegisterRequest(
@@ -25,3 +30,6 @@ data class LoginRequest(
     val password: String
 )
 
+data class MessageListRequest(
+    val userId: Long
+)

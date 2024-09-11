@@ -11,22 +11,17 @@ class DataDeserializer : JsonDeserializer<Data?> {
 
         val jsonObject = json.asJsonObject
 
-        // 检查是否存在 `type` 字段
-        val typeElement = jsonObject.get("type")
-
-        return if (typeElement != null && typeElement.isJsonPrimitive) {
-            when (typeElement.asString) {
-                "DataString" -> context.deserialize(jsonObject, Data.DataString::class.java)
-                "UserDetails" -> context.deserialize(jsonObject, Data.UserDetails::class.java)
-                "PaginatedData" -> context.deserialize(jsonObject, Data.PaginatedData::class.java)
-                "RevenueData" -> context.deserialize(jsonObject, Data.RevenueData::class.java)
-                "TransactionRecord" -> context.deserialize(jsonObject, Data.TransactionRecord::class.java)
-                "User" -> context.deserialize(jsonObject, Data.User::class.java)
-                else -> throw JsonParseException("Unknown element type: ${typeElement.asString}")
-            }
-        } else {
-            // 如果 `type` 字段不存在或不是有效的字符串，则返回 null
-            null
+        // 尝试匹配不同的 Data 子类
+        return when {
+            // 根据具体字段来确定类型
+            jsonObject.has("appKey") && jsonObject.has("username") -> context.deserialize(jsonObject, Data.User::class.java)
+            jsonObject.has("totalRevenue") && jsonObject.has("totalSpending") -> context.deserialize(jsonObject, Data.RevenueData::class.java)
+            jsonObject.has("buyerAvatar") && jsonObject.has("sellerAvatar") -> context.deserialize(jsonObject, Data.TransactionRecord::class.java)
+            jsonObject.has("current") && jsonObject.has("total") -> context.deserialize(jsonObject, Data.PaginatedData::class.java)
+            jsonObject.has("content") -> context.deserialize(jsonObject, Data.DataString::class.java)
+            jsonObject.has("fromUserId") && jsonObject.has("username") && jsonObject.has("unReadNum") -> context.deserialize(jsonObject, Data.MessageListData::class.java)
+            // 其他类型的判断...
+            else -> null
         }
     }
 }

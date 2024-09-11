@@ -21,6 +21,13 @@ sealed class Data {
         @SerializedName("userId") val userId: Long
     ) : Data()
 
+    // 消息列表数据
+    data class MessageListData(
+        @SerializedName("fromUserId") val fromUserId: String,
+        @SerializedName("username") val username: String,
+        @SerializedName("unReadNum") val unReadNum: Int
+    ) : Data()
+
     data class DataObject(val obj: Any) : Data()
 
     data class DataList(val list: List<Any>) : Data()
@@ -42,6 +49,7 @@ sealed class Data {
         @SerializedName("username") val username: String
     ) : Data()
 
+    //消息数据
     data class PaginatedData<T>(
         @SerializedName("current") val current: Int,
         @SerializedName("records") val records: List<T>,
@@ -72,10 +80,10 @@ sealed class Data {
     //登录post请求后获取到的信息字段
     data class User(
         @SerializedName("appKey") val appKey: String,
-        @SerializedName("avatar") val avatar: String,
+        @SerializedName("avatar") var avatar: String,
         @SerializedName("id") val id: Long,
-        @SerializedName("money") val money: Int,
-        @SerializedName("password") val password: String,
+        @SerializedName("money") var money: Int,
+        @SerializedName("password") var password: String,
         @SerializedName("username") val username: String
     ) : Data()
 
