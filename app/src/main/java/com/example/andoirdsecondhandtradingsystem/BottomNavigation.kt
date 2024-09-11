@@ -1,5 +1,6 @@
 package com.example.andoirdsecondhandtradingsystem
 
+import HomePage
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,7 +65,7 @@ fun MainContent() {
 
             }
                 when (selectedScreen) {
-                is ScreenPage.Home -> Text(text = "Home Screen")
+                is ScreenPage.Home -> HomePage()
                 is ScreenPage.Love -> Text(text = "Love Screen")
                 is ScreenPage.Capture -> Text(text = "Capture Screen")
                 is ScreenPage.Message ->  AppNavigation(navController, selectedScreen){showBars = it}

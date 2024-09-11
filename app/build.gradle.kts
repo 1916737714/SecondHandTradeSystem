@@ -68,10 +68,11 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:4.9.3") // 确保使用合适的版本
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation(libs.androidx.navigation.compose)//导航
-
+    implementation("com.google.android.material:material:1.5.0")
     implementation ("androidx.emoji2:emoji2-emojipicker:1.4.0-beta05")
-    implementation(libs.androidx.emoji2.bundled)//表情包
-
+    implementation(libs.androidx.emoji2.bundled)
+    implementation(libs.androidx.compose.material)
+    implementation(libs.material)//表情包
 
 
 

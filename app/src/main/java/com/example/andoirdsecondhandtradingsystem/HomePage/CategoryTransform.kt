@@ -1,0 +1,88 @@
+package com.example.andoirdsecondhandtradingsystem.HomePage
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.andoirdsecondhandtradingsystem.R
+import java.util.Locale.Category
+
+@Composable
+fun CategoryTransform(){
+    val selectedCategory = remember {
+        mutableStateOf("推荐")
+    }
+
+    CategoryList(categories = listOf("推荐","美食","电器","服饰","家具","生活","科技","旅行"),
+        onCategorySelected={
+            category->
+            selectedCategory.value=category
+        })
+
+    val productsByCategory= mapOf(
+
+    "推荐" to listOf(
+        Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃",88.0,"史玉程","美食",200,240),
+        Product(R.drawable.goods2,"更好吃",99.0,"郭佳灵","科技",200,160),
+    ),
+    "美食" to listOf(
+        Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃",88.0,"史玉程","美食",200,240),
+        Product(R.drawable.goods2,"更好吃",99.0,"郭佳灵","科技",200,160),
+        Product(R.drawable.image5,"太好吃",100.0,"cxk","旅游",200,240),
+    ),
+        "电器" to listOf(
+            Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃",88.0,"史玉程","美食",200,240),
+            Product(R.drawable.goods2,"更好吃",99.0,"郭佳灵","科技",200,160),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","旅游",200,240),
+            Product(R.drawable.image5,"byd太好吃",100.0,"cxk","生活",200,240),
+        ),
+        "服饰" to listOf(
+            Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃",88.0,"史玉程","美食",200,240),
+            Product(R.drawable.goods2,"更好吃",99.0,"郭佳灵","科技",200,160),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","旅游",200,240),
+            Product(R.drawable.image5,"byd太好吃",100.0,"cxk","生活",200,240),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","家电",200,240),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","服饰",200,240)
+        ),
+        "家具" to listOf(
+            Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃",88.0,"史玉程","美食",200,240),
+            Product(R.drawable.goods2,"更好吃",99.0,"郭佳灵","科技",200,160),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","旅游",200,240),
+            Product(R.drawable.image5,"byd太好吃",100.0,"cxk","生活",200,240),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","家电",200,240),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","服饰",200,240)
+        ),
+        "生活" to listOf(
+            Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃",88.0,"史玉程","美食",200,240),
+            Product(R.drawable.goods2,"更好吃",99.0,"郭佳灵","科技",200,160),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","旅游",200,240),
+            Product(R.drawable.image5,"byd太好吃",100.0,"cxk","生活",200,240),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","家电",200,240),
+        ),
+        "科技" to listOf(
+            Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃",88.0,"史玉程","美食",200,240),
+            Product(R.drawable.goods2,"更好吃",99.0,"郭佳灵","科技",200,160),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","家电",200,240),
+        ),
+        "旅行" to listOf(
+            Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃",88.0,"史玉程","美食",200,240),
+            Product(R.drawable.goods2,"更好吃",99.0,"郭佳灵","科技",200,160),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","旅游",200,240),
+            Product(R.drawable.image5,"byd太好吃",100.0,"cxk","生活",200,240),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","家电",200,240),
+            Product(R.drawable.image5,"太好吃",100.0,"cxk","服饰",200,240)
+        )
+    )
+
+    GoodsList(productsByCategory[selectedCategory.value]?: emptyList())
+}
+
