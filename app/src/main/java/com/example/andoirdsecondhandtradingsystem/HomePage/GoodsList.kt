@@ -1,6 +1,8 @@
 package com.example.andoirdsecondhandtradingsystem.HomePage
 
+import androidx.compose.foundation.CombinedClickableNode
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 
 data class Product(
     val imageUrl:Int,
@@ -51,7 +54,7 @@ data class Product(
 //}
 
 @Composable
-fun GoodsList(products: List<Product>) {
+fun GoodsList(products: List<Product>,navController: NavController) {
     Box(modifier = Modifier
         .verticalScroll(rememberScrollState())) {
         Row(modifier = Modifier
@@ -63,7 +66,9 @@ fun GoodsList(products: List<Product>) {
                     .fillMaxWidth(0.5f)
             ) {
                 for (i in 0 until products.size step 2) {
-                    ProductItem(product = products[i])
+                    ProductItem(product = products[i]){
+                        navController.navigate()
+                    }
                 }
             }
             // 只渲染奇数索引的产品（注意这里是从1开始，但索引是从0开始的，所以实际上是i+1为奇数）
@@ -77,11 +82,12 @@ fun GoodsList(products: List<Product>) {
 }
 
 @Composable
-fun ProductItem(product: Product) {
+fun ProductItem(product: Product,onClick:()->Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth() // 填充单元格宽度
             .padding(4.dp)
+            .clickable { onClick() }
     ) {
         // 假设你有一个加载网络图片的函数，这里使用本地资源作为示例
         // Image(painter = rememberImagePainter(data = product.imageUrl), ...)
