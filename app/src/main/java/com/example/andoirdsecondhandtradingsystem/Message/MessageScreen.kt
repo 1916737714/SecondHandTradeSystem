@@ -14,37 +14,40 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.andoirdsecondhandtradingsystem.R
 import com.example.andoirdsecondhandtradingsystem.ScreenPage
+import com.example.andoirdsecondhandtradingsystem.data.AuthViewModel
+import com.example.andoirdsecondhandtradingsystem.data.Data
 
 // 数据类
 data class Message(val id: Int, val content: String)
 
 @Composable
-fun AppNavigation(navController: NavHostController, selectedScreen: ScreenPage, onShowBarsChanged: (Boolean) -> Unit) {
+fun AppNavigation(navController: NavHostController, selectedScreen: ScreenPage,user: Data.User, onShowBarsChanged: (Boolean) -> Unit) {
     NavHost(navController, startDestination = "message_screen") {
         composable("message_screen") {
             if (selectedScreen == ScreenPage.Message) {
                 onShowBarsChanged(true) // 在MessageScreen中显示bars
-                MessageScreen(navController)
+                MessageScreen(navController,user)
             }
         }
         composable("chat_screen/{messageId}") { backStackEntry ->
             val messageId = backStackEntry.arguments?.getString("messageId")?.toIntOrNull()
             messageId?.let {
                 onShowBarsChanged(false) // 在MessageScreen中隐藏bars
-                ChatScreen(it,navController) }
+                ChatScreen(it,navController)   }
         }
 
     }
 }
 
 @Composable
-fun MessageScreen(navController: NavController) {
+fun MessageScreen(navController: NavController,user: Data.User,viewModel: AuthViewModel = viewModel()) {
     // 使用 remember 保存消息列表的状态
     var messages by remember { mutableStateOf<List<Message>?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -54,6 +57,7 @@ fun MessageScreen(navController: NavController) {
         // 模拟网络请求延迟
         kotlinx.coroutines.delay(1000)
         // 请求完成后更新消息列表
+        viewModel.getMessageList(user.id, onSuccess = {messageListData: Data.MessageListData ->   }, onError = {})
         messages = (1..20).map { Message(it, "Message content $it") }
         isLoading = false
     }

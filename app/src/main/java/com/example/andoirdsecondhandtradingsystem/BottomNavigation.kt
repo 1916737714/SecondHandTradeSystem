@@ -21,11 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.example.andoirdsecondhandtradingsystem.Goods.GoodsManage
 import com.example.andoirdsecondhandtradingsystem.Message.AppNavigation
+import com.example.andoirdsecondhandtradingsystem.data.Data
 
 
 //底部导航栏
 @Composable
-fun MainContent() {
+fun MainContent(user: Data.User) {
     var selectedScreen by remember { mutableStateOf<ScreenPage>(ScreenPage.Home) }
     var topBarTitle by remember { mutableStateOf("Home") }  // 用于存储顶部标题
     val navController = rememberNavController()
@@ -69,14 +70,26 @@ fun MainContent() {
                 is ScreenPage.Home -> HomePage()
                 is ScreenPage.Love -> Text(text = "Love Screen")
                 is ScreenPage.Capture -> GoodsManage()
-                is ScreenPage.Message ->  AppNavigation(navController, selectedScreen){showBars = it}
+                is ScreenPage.Message ->  AppNavigation(navController, selectedScreen,user){showBars = it}
     //                        MessageScreen(navController)
-                is ScreenPage.Mine -> Text(text = "Mine Screen")
+                is ScreenPage.Mine -> DisplayUserInfo(user = user)
+//                    Text(text = "Mine Screen")
             }
         }
     }
 }
 
+@Composable
+fun DisplayUserInfo(user: Data.User) {
+    Column {
+        Text(text = "AppKey: ${user.appKey}")
+        Text(text = "Avatar: ${user.avatar}")
+        Text(text = "ID: ${user.id}")
+        Text(text = "Money: ${user.money}")
+        Text(text = "Password: ${user.password}")
+        Text(text = "Username: ${user.username}")
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

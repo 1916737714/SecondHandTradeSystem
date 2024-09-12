@@ -20,13 +20,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -36,16 +41,13 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
-
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,18 +55,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.andoirdsecondhandtradingsystem.R
@@ -95,15 +103,11 @@ fun GoodsManage(){
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PublishProductScreen() {
     var productName by remember { mutableStateOf("") }
     var productDescription by remember { mutableStateOf("") }
     var productPrice by remember { mutableStateOf("") }
-    var productType by remember { mutableStateOf("") }
-    var productLocation by remember { mutableStateOf("") }
     var productImage: ImageBitmap? by remember { mutableStateOf(null) }
 
     val context = LocalContext.current
@@ -252,38 +256,70 @@ fun PublishProductScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 商品类型
+
+            //商品类型
+            var productType by remember { mutableStateOf("") }
+            var expandedType by remember { mutableStateOf(false) }
+            val categories = listOf("类型1", "类型2", "类型3", "类型4", "类型5")
+
+            var dropdownWidth by remember { mutableStateOf(0) }
+            var boxOffset by remember { mutableStateOf(Offset.Zero) }
+            val density = LocalDensity.current
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("商品类型", style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.width(16.dp))
-                var expandedType by remember { mutableStateOf(false) }
-                val categories = listOf("类型1", "类型2", "类型3", "类型4", "类型5")
-                Box {
-//                    BasicTextField(
-//                        value = productType,
-//                        onValueChange = { productType = it },
-//                        modifier = Modifier
-//
-//                            .background(Color.White)
-//                            .padding(8.dp)
-//                            .clickable { expandedType = true },
-//                        textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-//                        readOnly = true
-//                    )
+
+                Box(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(48.dp)
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .clickable { expandedType = true }
+                        .padding(16.dp)
+                        .onGloballyPositioned { coordinates ->
+                            dropdownWidth = coordinates.size.width
+                            boxOffset = coordinates.positionInRoot()
+                        }
+                ) {
+                    Row(
+                        Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = productType,
+                            style = TextStyle(color = Color.Black, fontSize = 16.sp),
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    }
+
                     DropdownMenu(
                         expanded = expandedType,
-                        onDismissRequest = { expandedType = false }
+                        onDismissRequest = { expandedType = false },
+                        modifier = Modifier.width(with(density) { dropdownWidth.toDp() }),
+                        offset = DpOffset(x = 0.dp, y = with(density) { -boxOffset.y.toDp() - 48.dp })
                     ) {
-                        categories.forEach { category ->
-                            DropdownMenuItem(
-                                onClick = {
-                                    productType = category
-                                    expandedType = false
-                                },
-                                text = { Text(category) }
-                            )
+                        Column(
+                            modifier = Modifier
+                                .heightIn(max = 200.dp)  // 设置最大高度
+                                .verticalScroll(rememberScrollState())  // 添加垂直滚动
+                        ) {
+                            categories.forEach { category ->
+                                DropdownMenuItem(
+                                    text = { Text(category) },
+                                    onClick = {
+                                        productType = (category)
+                                        expandedType = false
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }
@@ -291,56 +327,107 @@ fun PublishProductScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            //商品地址
             var productLocation by remember { mutableStateOf("") }
             var expandedLocation by remember { mutableStateOf(false) }
-            val locations = listOf("北京", "上海", "广州", "深圳", "杭州")
+            val locations = listOf("北京", "上海", "广州", "深圳", "杭州","广西壮族自治区")
 
-            // 商品所在地
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("商品地址", style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.width(16.dp))
 
-                Box {
-                    TextField(
-                        value = productLocation,
-                        onValueChange = {},
-                        modifier = Modifier
-                            .clickable { expandedLocation = true }
-                            .background(Color.White)
-                            .width(100.dp)
-                            .height(40.dp)
-                            .padding(8.dp),
-                        textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
-                        readOnly = true,
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null,
-                                tint = Color.Black
-                            )
-                        },
-
-                    )
+                Box(
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(48.dp)
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .clickable { expandedLocation = true }
+                        .padding(16.dp)
+                        .onGloballyPositioned { coordinates ->
+                            dropdownWidth = coordinates.size.width
+                            boxOffset = coordinates.positionInRoot()
+                        }
+                ) {
+                    Row(
+                        Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = productLocation,
+                            style = TextStyle(color = Color.Black, fontSize = 16.sp),
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    }
 
                     DropdownMenu(
                         expanded = expandedLocation,
-                        onDismissRequest = { expandedLocation = false }
+                        onDismissRequest = { expandedLocation = false },
+                        modifier = Modifier.width(with(density) { dropdownWidth.toDp() }),
+                        offset = DpOffset(x = 0.dp, y = with(density) { -boxOffset.y.toDp() - 48.dp })
                     ) {
-                        locations.forEach { location ->
-                            DropdownMenuItem(
-                                text = { Text(location) },
-                                onClick = {
-                                    productLocation = location
-                                    expandedLocation = false
-                                }
-                            )
+                        Column(
+                            modifier = Modifier
+                                .heightIn(max = 200.dp)  // 设置最大高度
+                                .verticalScroll(rememberScrollState())  // 添加垂直滚动
+                        ) {
+                            locations.forEach { location ->
+                                DropdownMenuItem(
+                                    text = { Text(location) },
+                                    onClick = {
+                                        productLocation =(location)
+                                        expandedLocation = false
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            //详细地址
+            var detailAddrress by remember { mutableStateOf("") }
+            Row {
+                Text("                   ")
+                Spacer(modifier = Modifier.height(16.dp))
+                BasicTextField(
+                    value = detailAddrress,
+                    onValueChange = { detailAddrress = it },
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(Color.White, RoundedCornerShape(8.dp))
+                        .padding(8.dp),
+                    textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                    decorationBox = { innerTextField ->
+                        if (detailAddrress.isEmpty()) {
+                            Text(
+                                text = "详细地址",
+                                style = TextStyle(color = Color.Gray, fontSize = 16.sp)
+                            )
+                        }
+                        innerTextField()
+                    }
+                )
+            }
+
+
+            var mergedAddress by remember { mutableStateOf("") }
+
+            // 合并地址逻辑,任意一方变化，则更新合并地址
+            LaunchedEffect(productLocation, detailAddrress) {
+                mergedAddress = "$productLocation $detailAddrress"
+            }
 
 
 
@@ -401,17 +488,36 @@ fun PublishProductScreen() {
 fun PreviewPublishProductScreen() {
     PublishProductScreen()
 }
-
+//待发布商品界面
 @Composable
 fun PendingProductScreen() {
-    // 示例：展示待发布商品的列表
+    // 示例商品数据
+    val products = List(10) { index ->
+        Product(
+            name = "商品名称 $index",
+            price = "￥${index * 10 + 0.99}",
+            imageRes = R.drawable.image5 // 替换为实际的图片资源ID
+        )
+    }
 
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(8.dp)
+    ) {
+        items(products) { product ->
+            ProductCard(product = product)
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+    }
+}
+//待发布商品卡片
+@Composable
+fun ProductCard(product: Product) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
-//        elevation = 4.dp,  // 设置卡片阴影
-        shape = RoundedCornerShape(16.dp)  // 设置卡片圆角
+            .padding(4.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
             Box {
@@ -419,23 +525,30 @@ fun PendingProductScreen() {
                     Box(
                         modifier = Modifier
                             .size(50.dp)
-                            .clip(RoundedCornerShape(16.dp))  // 设置图片圆角
+                            .clip(RoundedCornerShape(16.dp))
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.image5),
+                            painter = painterResource(id = product.imageRes),
                             contentDescription = null,
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Column {
-                        Text("商品名称", style = MaterialTheme.typography.titleLarge)
-//                        Spacer(modifier = Modifier.height(4.dp))
-                        Text("商品价格 ￥", style = MaterialTheme.typography.bodyLarge)
+                        Text(product.name, style = MaterialTheme.typography.titleLarge)
+                        Text(product.price, style = MaterialTheme.typography.bodyLarge)
                     }
                 }
             }
         }
     }
 }
+
+// 数据类表示商品
+data class Product(
+    val name: String,
+    val price: String,
+    val imageRes: Int,
+    val id: Int = name.hashCode() // 确保每个产品有唯一的 ID
+)
