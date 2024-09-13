@@ -398,7 +398,7 @@ fun PublishProductScreen() {
             //详细地址
             var detailAddrress by remember { mutableStateOf("") }
             Row {
-                Text("                   ")
+                Text("                       ")
                 Spacer(modifier = Modifier.height(16.dp))
                 BasicTextField(
                     value = detailAddrress,

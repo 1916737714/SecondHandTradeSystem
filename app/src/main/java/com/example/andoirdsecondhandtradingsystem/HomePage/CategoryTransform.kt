@@ -13,11 +13,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.andoirdsecondhandtradingsystem.R
 import java.util.Locale.Category
 
 @Composable
-fun CategoryTransform(){
+fun CategoryTransform(navController: NavController){
     val selectedCategory = remember {
         mutableStateOf("推荐")
     }
@@ -83,6 +84,6 @@ fun CategoryTransform(){
         )
     )
 
-    GoodsList(productsByCategory[selectedCategory.value]?: emptyList())
+    GoodsList(productsByCategory[selectedCategory.value]?: emptyList(), navController )
 }
 

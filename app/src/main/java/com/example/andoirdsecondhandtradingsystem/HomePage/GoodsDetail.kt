@@ -1,6 +1,6 @@
 package com.example.andoirdsecondhandtradingsystem.HomePage
 
-import androidx.compose.foundation.content.MediaType.Companion.Text
+//import androidx.compose.foundation.content.MediaType.Companion.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text

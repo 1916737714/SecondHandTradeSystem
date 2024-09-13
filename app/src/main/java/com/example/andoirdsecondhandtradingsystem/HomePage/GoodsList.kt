@@ -67,14 +67,16 @@ fun GoodsList(products: List<Product>,navController: NavController) {
             ) {
                 for (i in 0 until products.size step 2) {
                     ProductItem(product = products[i]){
-                        navController.navigate()
+                        navController.navigate("productDetail/${products[i].description}")
                     }
                 }
             }
             // 只渲染奇数索引的产品（注意这里是从1开始，但索引是从0开始的，所以实际上是i+1为奇数）
             Column {
                 for (i in 1 until products.size step 2) {
-                    ProductItem(product = products[i])
+                    ProductItem(product = products[i]) {
+                        navController.navigate("productDetail/${products[i].description}")
+                    }
                 }
             }
         }
