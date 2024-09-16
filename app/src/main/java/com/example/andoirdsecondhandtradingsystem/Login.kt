@@ -178,6 +178,8 @@ class Login(private val context: Context) {
                                 },
                                 onError = { errorMessage ->
                                     Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                                    Log.e("Login666", "Login successful: $errorMessage")
+
                                 }
                             )
 

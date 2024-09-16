@@ -1,4 +1,5 @@
 package com.example.andoirdsecondhandtradingsystem.Message
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -52,39 +53,58 @@ fun MessageScreen(navController: NavController,user: Data.User,viewModel: AuthVi
     var messages by remember { mutableStateOf<List<Message>?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // 模拟数据请求
     LaunchedEffect(Unit) {
         // 模拟网络请求延迟
         kotlinx.coroutines.delay(1000)
         // 请求完成后更新消息列表
-        viewModel.getMessageList(user.id, onSuccess = {messageListData: Data.MessageListData ->   }, onError = {})
-        messages = (1..20).map { Message(it, "Message content $it") }
-        isLoading = false
+
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        if (isLoading) {
-            // 显示加载指示器
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally), color = Color.Gray)
-        } else {
-            // 显示消息列表
-            messages?.let {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(vertical = 8.dp)
-                ) {
-                    items(it) { message ->
-                        MessageItem(message) { messageId ->
-                            navController.navigate("chat_screen/$messageId")
-                        }
-                    }
+
+
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(16.dp)
+//    ) {
+//        if (isLoading) {
+//            // 显示加载指示器
+//            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally), color = Color.Gray)
+//        } else {
+//            // 显示消息列表
+//            messages?.let {
+//                LazyColumn(
+//                    modifier = Modifier.fillMaxSize(),
+//                    contentPadding = PaddingValues(vertical = 8.dp)
+//                ) {
+//                    items(it) { message ->
+//                        MessageItem(message) { messageId ->
+//                            navController.navigate("chat_screen/$messageId")
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+    Button(onClick = {
+        viewModel.getMessageList(userId = user.id,
+            onSuccess = { messageListData ->
+                // 遍历 messageListData 并打印每个消息的属性
+                for (message in messageListData) {
+                    viewModel.getMessageDetail(fromUserId = message.fromUserId.toInt() ,
+                        userId = user.id,
+                        onSuccess = { Log.d("申请到资源了", "${message.fromUserId}")},
+                        onError = {})
+                    Log.d("MessageListData", "FromUserId: ${message.fromUserId}, Username: ${message.username}, UnReadNum: ${message.unReadNum}")
                 }
-            }
-        }
+                isLoading = false
+            },
+            onError = { errorMessage ->
+                Log.e("ErrorMessageList", "Error: $errorMessage")
+                isLoading = false
+            })
+    }) {
+        Text("获取消息列表")
     }
 }
 

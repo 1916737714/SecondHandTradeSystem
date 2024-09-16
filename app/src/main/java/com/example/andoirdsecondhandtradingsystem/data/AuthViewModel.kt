@@ -3,6 +3,7 @@ package com.example.andoirdsecondhandtradingsystem.data
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -11,11 +12,11 @@ import retrofit2.Response
 
 
 class AuthViewModel : ViewModel() {
-    private val apiService: ApiService by lazy {
+
+
+   val apiService: ApiService by lazy {
         RetrofitClient.instance.create(ApiService::class.java)
     }
-
-
 
     /**
      * 注册用户
@@ -77,10 +78,10 @@ class AuthViewModel : ViewModel() {
                 }
 
                 if (response.isSuccessful) {
-
+                    Log.d("getLoginMessage", "API response: $response")
                     //获取登录响应体
                     val loginresponse = response.body()
-                    Log.d("AuthViewModel", "API response: $loginresponse")
+                    Log.d("getLoginMessagebody", "API response: $loginresponse")
 
                     if (loginresponse != null) {
                         Log.d("AuthViewModel", "API response code: ${loginresponse.code}")
@@ -102,6 +103,7 @@ class AuthViewModel : ViewModel() {
                             } else {
                                 Log.e("AuthViewModel", "Login failed: data is null")
                                 onError("登录失败: 用户数据为空")
+
                             }
                         } else {
                             Log.e("AuthViewModel", "Login failed: ${loginresponse.msg}")
@@ -129,34 +131,87 @@ class AuthViewModel : ViewModel() {
      * 获取消息列表
      */
     fun getMessageList(
-        userId: Long,
-        onSuccess: (Data.MessageListData) -> Unit,
+        userId: Int,
+        onSuccess: (List<Data.MessageListData>) -> Unit,
         onError: (String) -> Unit
     ) {
         viewModelScope.launch {
             try {
+                Log.d("getMessageList", "Requesting messages for userId: $userId")
+
+                // 每次请求都创建新的 Call 实例
                 val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
-                    apiService.getMessageList(MessageListRequest(userId)).execute()
+                    apiService.getMessageList(userId).execute()
                 }
+
+                Log.d("getMessageList", "Response: ${response.body()}")
 
                 if (response.isSuccessful) {
                     val messageListResponse = response.body()
+                    Log.d("getMessageList", "MessageListResponse: $messageListResponse")
+
                     if (messageListResponse != null && messageListResponse.code == 200) {
-                        val messageListRcord= messageListResponse.data as Data.MessageListData
-                        Log.e("Message", "MessageListResponse: ${messageListRcord.fromUserId}")
-                        Log.e("Message", "MessageListResponse: ${messageListRcord.username}")
-                        Log.e("Message", "MessageListResponse: ${messageListRcord.unReadNum}")
-                            onSuccess(messageListRcord)
+                        val data = messageListResponse.data
+                        if (data is Data.DataWrapper) {
+                            Log.d("成功", "Message list request succeeded ${data}")
+                            onSuccess(data.messageList)
+                        } else {
+                            onError("Unexpected data type")
+                        }
                     } else {
                         onError(messageListResponse?.msg ?: "请求失败")
                     }
                 } else {
-                    onError("请求失败")
+                    onError("请求失败: ${response.code()}")
                 }
             } catch (e: HttpException) {
-                onError("请求失败: ${e.message}")
+                onError("请求http失败: ${e.message}")
             } catch (e: Exception) {
-                onError("请求失败: ${e.message}")
+                onError("请求异常，导致失败: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * 获取消息详情
+     */
+    fun getMessageDetail(
+        fromUserId: Int,
+        userId: Int,
+        onSuccess: (Data.MessageDatail) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        viewModelScope.launch {
+            try {
+                Log.d("getMessageList", "Requesting messages for userId: $userId")
+
+                // 每次请求都创建新的 Call 实例
+                val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
+                    apiService.getMessageDetail(fromUserId, userId).execute()
+                }
+
+                Log.d("getMessageList", "Response: ${response.body()}")
+
+                if (response.isSuccessful) {
+                    val messageDetailResponse = response.body()
+                    Log.d("getMessageList", "MessageListResponse: $messageDetailResponse")
+
+                    if (messageDetailResponse != null && messageDetailResponse.code == 200) {
+                        val data = messageDetailResponse.data
+
+                        onSuccess(data as Data.MessageDatail)
+
+                    } else {
+                        onError(messageDetailResponse?.msg ?: "请求失败")
+                    }
+                } else {
+                    onError("请求失败: ${response.code()}")
+                }
+            } catch (e: HttpException) {
+                onError("请求http失败: ${e.message}")
+            } catch (e: Exception) {
+                onError("请求异常，导致失败: ${e.message}")
             }
         }
     }
