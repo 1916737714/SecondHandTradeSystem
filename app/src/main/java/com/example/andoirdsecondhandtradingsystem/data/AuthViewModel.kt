@@ -1,10 +1,12 @@
 package com.example.andoirdsecondhandtradingsystem.data
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -17,6 +19,12 @@ class AuthViewModel : ViewModel() {
    val apiService: ApiService by lazy {
         RetrofitClient.instance.create(ApiService::class.java)
     }
+    private val _messageRecords = MutableLiveData<List<Data.MessageRecord>>()
+    val messageRecords: LiveData<List<Data.MessageRecord>> get() = _messageRecords
+
+    private var fromUserId: Int? = null
+    private var userId: Int? = null
+    private var currentpage: Int? = null
 
     /**
      * 注册用户
@@ -178,41 +186,165 @@ class AuthViewModel : ViewModel() {
     fun getMessageDetail(
         fromUserId: Int,
         userId: Int,
-        onSuccess: (Data.MessageDatail) -> Unit,
+        page: Int,
+        onSuccess: (List<Data.MessageRecord>) -> Unit,
         onError: (String) -> Unit
     ) {
-
         viewModelScope.launch {
             try {
-                Log.d("getMessageList", "Requesting messages for userId: $userId")
+                Log.d("getMessageDetail", "Requesting getMessageDetail for fromUserId: $fromUserId, userId: $userId, page: $page")
 
-                // 每次请求都创建新的 Call 实例
                 val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
-                    apiService.getMessageDetail(fromUserId, userId).execute()
+                    apiService.getMessageDetail(fromUserId, userId, page).execute()
                 }
 
-                Log.d("getMessageList", "Response: ${response.body()}")
+                Log.d("getMessageDetail", "Response: ${response.body()}")
 
                 if (response.isSuccessful) {
                     val messageDetailResponse = response.body()
-                    Log.d("getMessageList", "MessageListResponse: $messageDetailResponse")
+                    Log.d("getMessageDetail", "getMessageDetailResponse: $messageDetailResponse")
 
                     if (messageDetailResponse != null && messageDetailResponse.code == 200) {
-                        val data = messageDetailResponse.data
-
-                        onSuccess(data as Data.MessageDatail)
-
+                        val data = (messageDetailResponse.data as? Data.MessageDatail)?.records
+                        if (data != null) {
+                            Log.d("getMessageDetail", "MessageDetail request succeeded ${data}")
+                            val currentList = _messageRecords.value ?: emptyList()
+                            _messageRecords.postValue(if (page == 1) data else currentList + data) // 更新 LiveData
+                            onSuccess(data)
+                        } else {
+                            onError("No data available")
+                        }
                     } else {
-                        onError(messageDetailResponse?.msg ?: "请求失败")
+                        onError(messageDetailResponse?.msg ?: "Request failed")
                     }
                 } else {
-                    onError("请求失败: ${response.code()}")
+                    onError("getMessageDetail request failed: ${response.code()}")
                 }
             } catch (e: HttpException) {
-                onError("请求http失败: ${e.message}")
+                onError("getMessageDetail HTTP request failed: ${e.message}")
             } catch (e: Exception) {
-                onError("请求异常，导致失败: ${e.message}")
+                onError("getMessageDetail request failed due to exception: ${e.message}")
             }
+        }
+    }
+
+
+    /**
+     * 发送消息
+     */
+
+    fun sendMessage(
+        userId: Int,
+        toUserId: Int,
+        content: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
+                    apiService.sendMessage(SendMessageRequest(userId, toUserId, content)).execute()
+                }
+
+                if (response.isSuccessful) {
+                    val sendMessageDetailResponse = response.body()
+                    if (sendMessageDetailResponse != null && sendMessageDetailResponse.code == 200) {
+                        onSuccess()
+                    } else {
+                        onError(sendMessageDetailResponse?.msg ?: "Request failed")
+                    }
+                } else {
+                    onError("SendMessageDetail request failed: ${response.code()}")
+                }
+            } catch (e: HttpException) {
+                onError("SendMessageDetail HTTP request failed: ${e.message}")
+            } catch (e: Exception) {
+                onError("SendMessageDetail request failed due to exception: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * 设置用户ID，开始轮询,更新消息
+     */
+    fun setUserIds(fromUserId: Int, userId: Int,currentpage:Int) {
+        this.fromUserId = fromUserId
+        this.userId = userId
+        this.currentpage=currentpage
+        startPolling() // 开始轮询
+    }
+    //获取服务器历史消息
+    private fun startPolling() {
+        viewModelScope.launch {
+            while (true) {
+                delay(3500) // 每隔5秒轮询一次
+                fromUserId?.let { fromId ->
+                    userId?.let { userId ->
+                        currentpage?.let { page ->
+                            getMessageDetail(
+                                fromUserId = fromId,
+                                userId = userId,
+                                page = page,
+                                onSuccess = { data ->
+                                    if (data.isEmpty()) {
+                                        // 如果返回的数据为空，重置 currentpage 为 1
+                                        currentpage = 1
+                                    } else {
+                                        // 如果返回的数据不为空，增加 currentpage
+                                        currentpage = page + 1
+                                        updateMessageRecords(data, append = true)
+                                    }
+                                },
+                                onError = {
+                                    // 处理错误情况
+                                }
+                            )
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 将消息修改为已读
+     */
+
+    fun MarkMessageRead(
+        chatId: Int,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
+                    apiService.markMessageAsRead(chatId).execute()
+                }
+
+                if (response.isSuccessful) {
+                    val MarkMessageReadResponse = response.body()
+                    if (MarkMessageReadResponse != null && MarkMessageReadResponse.code == 200) {
+                        onSuccess()
+                    } else {
+                        onError(MarkMessageReadResponse?.msg ?: "Request failed")
+                    }
+                } else {
+                    onError("MarkMessageRead request failed: ${response.code()}")
+                }
+            } catch (e: HttpException) {
+                onError("MarkMessageRead HTTP request failed: ${e.message}")
+            } catch (e: Exception) {
+                onError("MarkMessageRead request failed due to exception: ${e.message}")
+            }
+        }
+    }
+
+    fun updateMessageRecords(newMessages: List<Data.MessageRecord>, append: Boolean = true) {
+        _messageRecords.value = if (append) {
+            (newMessages + _messageRecords.value.orEmpty()).distinctBy { it.id }
+        } else {
+            newMessages
         }
     }
 }

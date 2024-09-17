@@ -24,7 +24,6 @@ sealed class Data {
     ) : Data()
 
 
-
     //获取消息列表
     // 消息列表数据
     data class MessageListData(

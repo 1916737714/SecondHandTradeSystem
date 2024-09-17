@@ -290,7 +290,7 @@ fun PublishProductScreen() {
                     ) {
                         Text(
                             text = productType,
-                            style = TextStyle(color = Color.Black, fontSize = 16.sp),
+                            style = TextStyle(color = Color.Black, fontSize = 12.sp),
                             modifier = Modifier.weight(1f)
                         )
                         Icon(
@@ -357,7 +357,7 @@ fun PublishProductScreen() {
                     ) {
                         Text(
                             text = productLocation,
-                            style = TextStyle(color = Color.Black, fontSize = 16.sp),
+                            style = TextStyle(color = Color.Black, fontSize = 12.sp),
                             modifier = Modifier.weight(1f)
                         )
                         Icon(

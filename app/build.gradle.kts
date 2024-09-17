@@ -73,7 +73,8 @@ dependencies {
     implementation ("androidx.emoji2:emoji2-emojipicker:1.4.0-beta05")
     implementation(libs.androidx.emoji2.bundled)
     implementation(libs.androidx.compose.material)
-    implementation(libs.material)//表情包
+    implementation(libs.material)
+    implementation(libs.androidx.runtime.livedata)//表情包
 
 
 

@@ -14,146 +14,212 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.andoirdsecondhandtradingsystem.R
 import com.example.andoirdsecondhandtradingsystem.ScreenPage
 import com.example.andoirdsecondhandtradingsystem.data.AuthViewModel
 import com.example.andoirdsecondhandtradingsystem.data.Data
+import com.google.gson.Gson
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 // 数据类
 data class Message(val id: Int, val content: String)
 
-@Composable
-fun AppNavigation(navController: NavHostController, selectedScreen: ScreenPage,user: Data.User, onShowBarsChanged: (Boolean) -> Unit) {
-    NavHost(navController, startDestination = "message_screen") {
-        composable("message_screen") {
-            if (selectedScreen == ScreenPage.Message) {
-                onShowBarsChanged(true) // 在MessageScreen中显示bars
-                MessageScreen(navController,user)
-            }
-        }
-        composable("chat_screen/{messageId}") { backStackEntry ->
-            val messageId = backStackEntry.arguments?.getString("messageId")?.toIntOrNull()
-            messageId?.let {
-                onShowBarsChanged(false) // 在MessageScreen中隐藏bars
-                ChatScreen(it,navController)   }
-        }
-
+sealed class Screen(val route: String) {
+    object MessageListScreen : Screen("message_screen")
+    object ChatScreen : Screen("chat_screen/{fromUserId}/{fromUsername}/{userId}") {
+        fun createRoute(fromUserId: String, fromUsername: String, userId: String) =
+            "chat_screen/$fromUserId/$fromUsername/$userId"
     }
 }
 
 @Composable
-fun MessageScreen(navController: NavController,user: Data.User,viewModel: AuthViewModel = viewModel()) {
-    // 使用 remember 保存消息列表的状态
-    var messages by remember { mutableStateOf<List<Message>?>(null) }
+fun AppNavigation(navController: NavHostController, selectedScreen: ScreenPage, user: Data.User, onShowBarsChanged: (Boolean) -> Unit) {
+    NavHost(navController, startDestination = Screen.MessageListScreen.route) {
+        composable(Screen.MessageListScreen.route) {
+            if (selectedScreen == ScreenPage.Message) {
+                onShowBarsChanged(true) // 在MessageScreen中显示bars
+                MessageScreen(navController, user)
+            }
+        }
+        composable(
+            route = Screen.ChatScreen.route,
+            arguments = listOf(
+                navArgument("fromUserId") { type = NavType.StringType },
+                navArgument("fromUsername") { type = NavType.StringType },
+                navArgument("userId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val fromUserId = backStackEntry.arguments?.getString("fromUserId").orEmpty()
+            val fromUsername = backStackEntry.arguments?.getString("fromUsername").orEmpty()
+            val userId = backStackEntry.arguments?.getString("userId").orEmpty()
+            onShowBarsChanged(false) // 在ChatScreen中隐藏bars
+            ChatScreen(fromUserId, fromUsername, userId.toInt(), navController)
+        }
+    }
+}
+
+
+
+
+@Composable
+fun MessageScreen(navController: NavController, user: Data.User, viewModel: AuthViewModel = viewModel()) {
+    var messages by remember { mutableStateOf<List<Data.MessageRecord>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         // 模拟网络请求延迟
         kotlinx.coroutines.delay(1000)
-        // 请求完成后更新消息列表
-
-    }
-
-
-
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp)
-//    ) {
-//        if (isLoading) {
-//            // 显示加载指示器
-//            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally), color = Color.Gray)
-//        } else {
-//            // 显示消息列表
-//            messages?.let {
-//                LazyColumn(
-//                    modifier = Modifier.fillMaxSize(),
-//                    contentPadding = PaddingValues(vertical = 8.dp)
-//                ) {
-//                    items(it) { message ->
-//                        MessageItem(message) { messageId ->
-//                            navController.navigate("chat_screen/$messageId")
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-    Button(onClick = {
-        viewModel.getMessageList(userId = user.id,
+        viewModel.getMessageList(
+            userId = user.id,
             onSuccess = { messageListData ->
-                // 遍历 messageListData 并打印每个消息的属性
-                for (message in messageListData) {
-                    viewModel.getMessageDetail(fromUserId = message.fromUserId.toInt() ,
+                messageListData.forEach { message ->
+                    viewModel.getMessageDetail(
+                        fromUserId = message.fromUserId.toInt(),
                         userId = user.id,
-                        onSuccess = { Log.d("申请到资源了", "${message.fromUserId}")},
-                        onError = {})
-                    Log.d("MessageListData", "FromUserId: ${message.fromUserId}, Username: ${message.username}, UnReadNum: ${message.unReadNum}")
+                        page = 1,
+                        onSuccess = { messageDetailData ->
+                            messages = (messages + messageDetailData).distinctBy { it.id }
+                            isLoading = false
+                        },
+                        onError = { errorMessage ->
+                            Log.e("Error", "Error: $errorMessage")
+                            isLoading = false
+                        }
+                    )
                 }
-                isLoading = false
             },
             onError = { errorMessage ->
                 Log.e("ErrorMessageList", "Error: $errorMessage")
                 isLoading = false
-            })
-    }) {
-        Text("获取消息列表")
+            }
+        )
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally), color = Color.Gray)
+        } else {
+            val latestMessagesMap = messages.groupBy { it.fromUsername }.mapValues { entry ->
+                entry.value.maxByOrNull { it.id }!!
+            }
+            val latestMessages = latestMessagesMap.values.filter { it.fromUsername != user.username }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(vertical = 8.dp)
+            ) {
+                items(latestMessages.toList()) { message ->
+                    MessageItem(message) { messageId ->
+                        val fromUserId = message.fromUserId
+                        val fromUsername = message.fromUsername
+                        val userId = user.id.toString()
+                        navController.navigate(Screen.ChatScreen.createRoute(fromUserId, fromUsername, userId))
+
+                        // 调用MarkMessageRead方法更新服务器端消息状态
+                        viewModel.MarkMessageRead(
+                            chatId = messageId,
+                            onSuccess = {
+                                // 更新本地消息状态为已读
+                                messages = messages.map {
+                                    if (it.id.toInt() == messageId) it.copy(status = true) else it
+                                }
+                            },
+                            onError = { errorMessage ->
+                                Log.e("MarkMessageRead", "Error: $errorMessage")
+                            }
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
+
+
+
 @Composable
-fun MessageItem(message: Message, onMessageClick: (Int) -> Unit) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .clickable { onMessageClick(message.id) })
-    {
+fun MessageItem(message: Data.MessageRecord, onMessageClick: (Int) -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onMessageClick(message.id.toInt()) }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
-            Box(modifier = Modifier.size(64.dp))
-            {
-                //图片
-                Image(painter = painterResource(id = R.drawable.image5),
+            Box(modifier = Modifier.size(64.dp)) {
+                Image(
+                    painter = painterResource(id = R.drawable.image5),
                     contentDescription = null,
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
                 )
-                //红点
-                Box(
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clip(CircleShape)
-                        .background(Color.Red)
-                        .align(Alignment.TopEnd)  // 将红点定位在右上角
-                        .offset(x = 4.dp, y = (-4).dp) // 可选：根据需要调整红点的位置
-                )
+                // 显示红点的逻辑
+                if (!message.status) {
+                    Box(
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clip(CircleShape)
+                            .background(Color.Red)
+                            .align(Alignment.TopEnd)
+                            .offset(x = 4.dp, y = (-4).dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(8.dp))
-            //聊天简介
+
             Column {
                 Row {
-                    Column (modifier = Modifier.weight(1f)){
-                        Text(text = "Message ID: ${message.id}")
-                        Text(text = message.content)
-                        Text(text = "date")
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = message.fromUsername,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = message.content,
+                            color = Color.Gray,
+                            fontSize = 16.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = formatTimestampToDate(message.createTime.toLong()),
+                            color = Color.Gray,
+                            fontSize = 12.sp
+                        )
                     }
-                    Box(modifier = Modifier.size(64.dp))
-                    {
-                        Image(painter = painterResource(id = R.drawable.image5),
+                    Box(modifier = Modifier.size(64.dp)) {
+                        Image(
+                            painter = painterResource(id = R.drawable.image5),
                             contentDescription = null,
-                            modifier = Modifier
-                                .size(64.dp)
+                            modifier = Modifier.size(64.dp)
                         )
                     }
                 }
@@ -162,3 +228,11 @@ fun MessageItem(message: Message, onMessageClick: (Int) -> Unit) {
         }
     }
 }
+
+//将时间戳转换陈YYYY-MM-DD格式
+fun formatTimestampToDate(timestamp: Long): String {
+    val localDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault())
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    return localDateTime.format(formatter)
+}
+
