@@ -34,7 +34,7 @@ fun AppNavigation(navController: NavHostController, selectedScreen: ScreenPage,o
         composable("chat_screen/{messageId}") { backStackEntry ->
             val messageId = backStackEntry.arguments?.getString("messageId")?.toIntOrNull()
             messageId?.let {
-                onShowBarsChanged(false) // 在MessageScreen中隐藏bars
+                onShowBarsChanged(true) // 在MessageScreen中隐藏bars
                 ChatScreen(it,navController) }
         }
 

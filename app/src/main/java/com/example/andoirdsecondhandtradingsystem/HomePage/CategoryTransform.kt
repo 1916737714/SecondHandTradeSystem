@@ -13,11 +13,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.andoirdsecondhandtradingsystem.R
 import java.util.Locale.Category
 
 @Composable
-fun CategoryTransform(){
+fun CategoryTransform(navController: NavController){
     val selectedCategory = remember {
         mutableStateOf("推荐")
     }
@@ -26,12 +28,12 @@ fun CategoryTransform(){
         onCategorySelected={
             category->
             selectedCategory.value=category
-        })
+        },"推荐")
 
     val productsByCategory= mapOf(
 
     "推荐" to listOf(
-        Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃",88.0,"史玉程","美食",200,240),
+        Product(R.drawable.goods1,"好吃好吃好吃好吃好吃好吃hahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh",88.0,"史玉程","美食",200,240),
         Product(R.drawable.goods2,"更好吃",99.0,"郭佳灵","科技",200,160),
     ),
     "美食" to listOf(
@@ -83,6 +85,7 @@ fun CategoryTransform(){
         )
     )
 
-    GoodsList(productsByCategory[selectedCategory.value]?: emptyList())
+//    PageTransform(navController, products = productsByCategory[selectedCategory.value]?: emptyList())
+    GoodsList(navController,products = productsByCategory[selectedCategory.value]?: emptyList())
 }
 

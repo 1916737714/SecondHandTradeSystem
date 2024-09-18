@@ -18,13 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 
 
 //底部导航栏
 @Composable
-fun MainContent() {
+fun MainContent(navController1: NavController) {
     var selectedScreen by remember { mutableStateOf<ScreenPage>(ScreenPage.Home) }
     var topBarTitle by remember { mutableStateOf("Home") }  // 用于存储顶部标题
     val navController = rememberNavController()
@@ -65,7 +66,7 @@ fun MainContent() {
 
             }
                 when (selectedScreen) {
-                is ScreenPage.Home -> HomePage()
+                is ScreenPage.Home -> HomePage(navController1)
                 is ScreenPage.Love -> Text(text = "Love Screen")
                 is ScreenPage.Capture -> Text(text = "Capture Screen")
                 is ScreenPage.Message ->  AppNavigation(navController, selectedScreen){showBars = it}

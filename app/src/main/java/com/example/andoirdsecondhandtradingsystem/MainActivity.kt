@@ -30,6 +30,7 @@ import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.andoirdsecondhandtradingsystem.HomePage.MyApp
 
 import com.example.andoirdsecondhandtradingsystem.ui.theme.AndoirdSecondHandTradingSystemTheme
 
@@ -59,7 +60,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if(isLoggedIn) {
-                    MainContent()
+                    MyApp()
                 }else
                 {
                     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
