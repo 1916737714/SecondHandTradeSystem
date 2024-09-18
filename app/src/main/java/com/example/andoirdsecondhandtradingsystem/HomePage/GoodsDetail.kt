@@ -1,5 +1,6 @@
 package com.example.andoirdsecondhandtradingsystem.HomePage
 
+<<<<<<< HEAD
 import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -98,3 +99,30 @@ fun GoodsDetail(navController: NavController,product: Product){
 //    Text(text = "好吃")
 //    Text(text = "爱吃")
 //}
+=======
+//import androidx.compose.foundation.content.MediaType.Companion.Text
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+
+@Composable
+fun GoodsDetail(product: Product){
+    Column{
+        Text(
+            text = product.publisher,
+        )
+        Text(
+            text = product.description
+        )
+        RoundedImage(product = product)
+    }
+    Text(
+        text = "买家评价"
+    )
+    Text(
+        text="很好吃"
+        )
+}
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce

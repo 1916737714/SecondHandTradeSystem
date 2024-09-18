@@ -36,6 +36,7 @@ object RetrofitClient {
     //控制访问时间
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
+            .cache(null)
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
@@ -47,6 +48,7 @@ object RetrofitClient {
     private val gson: Gson = GsonBuilder()
         .registerTypeAdapter(Data::class.java, DataDeserializer())
         .create()
+
 
     val instance: Retrofit by lazy {
         Retrofit.Builder()

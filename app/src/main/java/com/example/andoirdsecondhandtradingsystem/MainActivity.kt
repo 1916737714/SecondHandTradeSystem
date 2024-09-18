@@ -33,32 +33,35 @@ import androidx.navigation.compose.rememberNavController
 import com.example.andoirdsecondhandtradingsystem.HomePage.MyApp
 
 import com.example.andoirdsecondhandtradingsystem.ui.theme.AndoirdSecondHandTradingSystemTheme
+import com.example.andoirdsecondhandtradingsystem.data.Data
 
 class MainActivity : ComponentActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
-
             AndoirdSecondHandTradingSystemTheme {
 
+            }
                 //表情配置
                 val config = BundledEmojiCompatConfig(this)
                 EmojiCompat.init(config)
 
+
                 val login = Login(context = this)
                 val register = Register()
                 var currentScreen by remember { mutableStateOf("Login") }
-
                 var isLoggedIn by remember { mutableStateOf(false) }
+                var user by remember { mutableStateOf<Data.User?>(null) }
 
-                //回退
                 BackHandler(currentScreen != "Login") {
                     currentScreen = "Login"
                 }
 
+<<<<<<< HEAD
                 if(isLoggedIn) {
                     MyApp()
                 }else
@@ -67,38 +70,54 @@ class MainActivity : ComponentActivity() {
                         // 动画弹簧
 
                         // 登录
+=======
+                if (isLoggedIn) {
+                    user?.let {
+                        MainContent(user = it)
+                    } ?: run {
+                        currentScreen = "Login"
+                        isLoggedIn = false
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Bottom
+                    ) {
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
                         AnimatedVisibility(
                             visible = currentScreen == "Login",
                             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(animationSpec = tween(300)),
                             exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(animationSpec = tween(300))
                         ) {
-
-                            login.Login(modifier = Modifier.fillMaxSize(),
+                            login.Login(
+                                modifier = Modifier.fillMaxSize(),
                                 onRegisterClick = {
                                     currentScreen = "Register"
                                 },
-                                onLoginSuccess = {
-                                    isLoggedIn = true// 更新登录状态
-                                })
+                                onLoginSuccess = { loggedInUser ->
+                                    user = loggedInUser
+                                    isLoggedIn = true
+                                }
+                            )
                         }
-                        //注册
                         AnimatedVisibility(
                             visible = currentScreen == "Register",
                             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(animationSpec = tween(300)),
                             exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(animationSpec = tween(300))
                         ) {
-                            register.Register(modifier = Modifier.fillMaxSize(),
-                                onRegisterSuccess = {currentScreen = "Login"},
+                            register.Register(
+                                modifier = Modifier.fillMaxSize(),
+                                onRegisterSuccess = { currentScreen = "Login" },
                                 onError = { errorMessage ->
-                                    // 处理错误，例如显示一个 SnackBar
                                     println("注册失败: $errorMessage")
-                                })
+                                }
+                            )
                         }
                     }
                 }
             }
         }
-    }
+
 }
 
 

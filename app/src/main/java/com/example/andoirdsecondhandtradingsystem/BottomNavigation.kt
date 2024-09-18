@@ -20,12 +20,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-
+import com.example.andoirdsecondhandtradingsystem.Goods.GoodsManage
+import com.example.andoirdsecondhandtradingsystem.Message.AppNavigation
+import com.example.andoirdsecondhandtradingsystem.data.Data
 
 
 //底部导航栏
 @Composable
+<<<<<<< HEAD
 fun MainContent(navController1: NavController) {
+=======
+fun MainContent(user: Data.User) {
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
     var selectedScreen by remember { mutableStateOf<ScreenPage>(ScreenPage.Home) }
     var topBarTitle by remember { mutableStateOf("Home") }  // 用于存储顶部标题
     val navController = rememberNavController()
@@ -46,7 +52,7 @@ fun MainContent(navController1: NavController) {
                     topBarTitle = when (screen) {
                         ScreenPage.Home -> "首页"
                         ScreenPage.Love -> "收藏"
-                        ScreenPage.Capture -> "Capture"
+                        ScreenPage.Capture -> "商品管理"
                         ScreenPage.Message -> "消息"
                         ScreenPage.Mine -> "我的信息"
                     }
@@ -66,17 +72,33 @@ fun MainContent(navController1: NavController) {
 
             }
                 when (selectedScreen) {
+<<<<<<< HEAD
                 is ScreenPage.Home -> HomePage(navController1)
+=======
+                is ScreenPage.Home -> HomePage(navController)
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
                 is ScreenPage.Love -> Text(text = "Love Screen")
-                is ScreenPage.Capture -> Text(text = "Capture Screen")
-                is ScreenPage.Message ->  AppNavigation(navController, selectedScreen){showBars = it}
+                is ScreenPage.Capture -> GoodsManage()
+                is ScreenPage.Message ->  AppNavigation(navController, selectedScreen,user){showBars = it}
     //                        MessageScreen(navController)
-                is ScreenPage.Mine -> Text(text = "Mine Screen")
+                is ScreenPage.Mine -> DisplayUserInfo(user = user)
+//                    Text(text = "Mine Screen")
             }
         }
     }
 }
 
+@Composable
+fun DisplayUserInfo(user: Data.User) {
+    Column {
+        Text(text = "AppKey: ${user.appKey}")
+        Text(text = "Avatar: ${user.avatar}")
+        Text(text = "ID: ${user.id}")
+        Text(text = "Money: ${user.money}")
+        Text(text = "Password: ${user.password}")
+        Text(text = "Username: ${user.username}")
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

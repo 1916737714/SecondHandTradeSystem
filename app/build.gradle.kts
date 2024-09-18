@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
@@ -72,7 +73,8 @@ dependencies {
     implementation ("androidx.emoji2:emoji2-emojipicker:1.4.0-beta05")
     implementation(libs.androidx.emoji2.bundled)
     implementation(libs.androidx.compose.material)
-    implementation(libs.material)//表情包
+    implementation(libs.material)
+    implementation(libs.androidx.runtime.livedata)//表情包
 
 
 

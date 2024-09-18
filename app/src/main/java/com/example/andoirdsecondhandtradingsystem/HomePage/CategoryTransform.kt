@@ -14,7 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+<<<<<<< HEAD
 import androidx.navigation.compose.rememberNavController
+=======
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
 import com.example.andoirdsecondhandtradingsystem.R
 import java.util.Locale.Category
 
@@ -85,7 +88,11 @@ fun CategoryTransform(navController: NavController){
         )
     )
 
+<<<<<<< HEAD
 //    PageTransform(navController, products = productsByCategory[selectedCategory.value]?: emptyList())
     GoodsList(navController,products = productsByCategory[selectedCategory.value]?: emptyList())
+=======
+    GoodsList(productsByCategory[selectedCategory.value]?: emptyList(), navController )
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
 }
 

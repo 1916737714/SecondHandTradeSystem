@@ -1,9 +1,14 @@
 package com.example.andoirdsecondhandtradingsystem.HomePage
 
+<<<<<<< HEAD
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+=======
+import androidx.compose.foundation.CombinedClickableNode
+import androidx.compose.foundation.Image
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+<<<<<<< HEAD
 import androidx.navigation.ActivityNavigator
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -38,6 +44,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
+=======
+import androidx.navigation.NavController
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
 
 data class Product(
     val imageUrl:Int,
@@ -50,7 +59,11 @@ data class Product(
 )
 
 @Composable
+<<<<<<< HEAD
 fun GoodsList(navController: NavController,products: List<Product>) {
+=======
+fun GoodsList(products: List<Product>,navController: NavController) {
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
     Box(modifier = Modifier
         .verticalScroll(rememberScrollState())) {
         Row(modifier = Modifier
@@ -63,10 +76,16 @@ fun GoodsList(navController: NavController,products: List<Product>) {
                     .fillMaxWidth(0.5f)
             ) {
                 for (i in 0 until products.size step 2) {
+<<<<<<< HEAD
                     ProductItem(product = products[i], onClick ={
                         val productJson=Gson().toJson(products[i])
                         navController.navigate("goodsDetail/$productJson")
                     })
+=======
+                    ProductItem(product = products[i]){
+                        navController.navigate("productDetail/${products[i].description}")
+                    }
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
                 }
             }
             // 只渲染奇数索引的产品（注意这里是从1开始，但索引是从0开始的，所以实际上是i+1为奇数）
@@ -74,10 +93,16 @@ fun GoodsList(navController: NavController,products: List<Product>) {
                 .padding(4.dp)
             ){
                 for (i in 1 until products.size step 2) {
+<<<<<<< HEAD
                     ProductItem(product = products[i], onClick = {
                         val productJson=Gson().toJson(products[i])
                         navController.navigate("goodsDetail/$productJson")
                     })
+=======
+                    ProductItem(product = products[i]) {
+                        navController.navigate("productDetail/${products[i].description}")
+                    }
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
                 }
             }
         }
@@ -93,7 +118,11 @@ fun ProductItem(product: Product,onClick:()->Unit) {
             .border(BorderStroke(2.dp, Color.White), RoundedCornerShape(16.dp))
             .fillMaxWidth() // 填充单元格宽度
             .padding(4.dp)
+<<<<<<< HEAD
             .background(Color(0xFFF0F0F0))
+=======
+            .clickable { onClick() }
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
     ) {
         // 假设你有一个加载网络图片的函数，这里使用本地资源作为示例
         // Image(painter = rememberImagePainter(data = product.imageUrl), ...)
