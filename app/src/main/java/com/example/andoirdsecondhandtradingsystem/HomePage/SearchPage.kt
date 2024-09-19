@@ -37,20 +37,26 @@ fun SearchPage() {
                 .height(36.dp)
                 .padding(6.dp)
         )
-        val gradientBrush = Brush.horizontalGradient(colors = listOf(Color(0xFFFFEB3B), Color(0xFFFF9800))) // 渐变背景
-        Box(
-            modifier = Modifier
-                .height(36.dp)
-                .clip(RoundedCornerShape(50)) // 圆角
-                .background(gradientBrush) // 渐变背景
+        Button("搜索",modifier=Modifier.fillMaxWidth())
+    }
+}
+
+
+@Composable
+fun Button(string: String,modifier: Modifier){
+    val gradientBrush = Brush.horizontalGradient(colors = listOf(Color(0xFFFFEB3B), Color(0xFFFF9800))) // 渐变背景
+    Box(
+        modifier = Modifier
+            .height(36.dp)
+            .clip(RoundedCornerShape(50)) // 圆角
+            .background(gradientBrush) // 渐变背景
+    ) {
+        Button(onClick = {/**/},
+            modifier = modifier,
+            contentPadding = PaddingValues(8.dp),
+            colors = ButtonDefaults.buttonColors(Color.Transparent)
         ) {
-            Button(onClick = {/**/},
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(8.dp),
-                colors = ButtonDefaults.buttonColors(Color.Transparent)
-            ) {
-                Text("搜索", color = Color.White, fontSize = 16.sp) // 使用字符串资源
-            }
+            Text(string, color = Color.White, fontSize = 16.sp) // 使用字符串资源
         }
     }
 }

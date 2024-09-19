@@ -30,6 +30,7 @@ import androidx.emoji2.bundled.BundledEmojiCompatConfig
 import androidx.emoji2.text.EmojiCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.andoirdsecondhandtradingsystem.HomePage.MyApp
 
 import com.example.andoirdsecondhandtradingsystem.ui.theme.AndoirdSecondHandTradingSystemTheme
 import com.example.andoirdsecondhandtradingsystem.data.Data
@@ -60,6 +61,16 @@ class MainActivity : ComponentActivity() {
                     currentScreen = "Login"
                 }
 
+<<<<<<< HEAD
+                if(isLoggedIn) {
+                    MyApp()
+                }else
+                {
+                    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+                        // 动画弹簧
+
+                        // 登录
+=======
                 if (isLoggedIn) {
                     user?.let {
                         MainContent(user = it)
@@ -72,6 +83,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Bottom
                     ) {
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
                         AnimatedVisibility(
                             visible = currentScreen == "Login",
                             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(animationSpec = tween(300)),

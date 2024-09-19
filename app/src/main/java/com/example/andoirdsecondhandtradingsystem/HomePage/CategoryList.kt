@@ -15,6 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+<<<<<<< HEAD
+import com.google.android.material.navigation.NavigationBarView.OnItemSelectedListener
+import java.util.Locale.Category
+=======
+>>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
 
 
 //@Composable
@@ -34,9 +39,9 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun CategoryList(categories: List<String>,onCategorySelected:(String)->Unit) {
+fun CategoryList(categories: List<String>,onCategorySelected:(String)->Unit,defaultCategory: String?) {
     val selectedCategory=remember {
-        mutableStateOf<String?>(null)
+        mutableStateOf(defaultCategory)
     }
 
     LazyRow(
