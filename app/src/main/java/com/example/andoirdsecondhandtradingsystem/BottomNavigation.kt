@@ -69,7 +69,7 @@ fun MainContent(user: Data.User) {
                 when (selectedScreen) {
                 is ScreenPage.Home -> HomePage(navController)
                 is ScreenPage.Love -> Text(text = "Love Screen")
-                is ScreenPage.Capture -> GoodsManage()
+                is ScreenPage.Capture -> GoodsManage(user)
                 is ScreenPage.Message ->  AppNavigation(navController, selectedScreen,user){showBars = it}
     //                        MessageScreen(navController)
                 is ScreenPage.Mine -> DisplayUserInfo(user = user)

@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.MultipartBody
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -306,6 +307,14 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+    //更新消息列表
+    fun updateMessageRecords(newMessages: List<Data.MessageRecord>, append: Boolean = true) {
+        _messageRecords.value = if (append) {
+            (newMessages + _messageRecords.value.orEmpty()).distinctBy { it.id }
+        } else {
+            newMessages
+        }
+    }
 
     /**
      * 将消息修改为已读
@@ -339,13 +348,184 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+    /**
+     * 获取全部商品类型
+     */
 
-    fun updateMessageRecords(newMessages: List<Data.MessageRecord>, append: Boolean = true) {
-        _messageRecords.value = if (append) {
-            (newMessages + _messageRecords.value.orEmpty()).distinctBy { it.id }
-        } else {
-            newMessages
+    fun getAllGoodsType(
+        onSuccess: (List<Data.goodsType>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+
+                val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
+                    apiService.getAllGoodsType().execute()
+                }
+
+                if (response.isSuccessful) {
+                    val getAllGoodsTypeResponse = response.body()
+
+                    if (getAllGoodsTypeResponse != null && getAllGoodsTypeResponse.code == 200) {
+
+                        val goodsTypeList = (getAllGoodsTypeResponse.data as Data.goodsTypeList).GoodsTypeList
+                       Log.d("getAllGoodsType","getAllGoodsType Sucussee${getAllGoodsTypeResponse.data}")
+                        onSuccess(goodsTypeList)
+
+                    } else {
+                        Log.e("getAllGoodsType","getAllGoodsType Failed")
+                    }
+                } else {
+                    Log.e("getAllGoodsType","getAllGoodsType request failed: ${response.code()}")
+                    onError("getAllGoodsTypeException request failed: ${response.code()}")
+                }
+            } catch (e: HttpException) {
+                Log.e ("getAllGoodsTypeFunction…","getAllGoodsType HTTP request failed: ${e.message}")
+                onError("getAllGoodsType HTTP request failed: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("getAllGoodsTypeException","getAllGoodsType request failed due to exception: ${e.message}")
+                onError("getAllGoodsType request failed due to exception: ${e.message}")
+            }
         }
     }
+
+    /**
+     * 上传图片
+     */
+
+    fun uploadFiles(
+        files:  List<MultipartBody.Part>,
+        onSuccess: (Data.upLoadFile) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+
+                val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
+                    apiService.uploadFiles(files).execute()
+                }
+
+                if (response.isSuccessful) {
+                    val uploadFilesResponse = response.body()
+
+                    Log.d("uploadFiles","uploadFiles Sucussee${uploadFilesResponse}")
+
+                    if (uploadFilesResponse != null && uploadFilesResponse.code == 200) {
+
+                        val uploadFiles = uploadFilesResponse.data as Data.upLoadFile
+                        Log.d("uploadFiles","uploadFiles Sucussee${uploadFilesResponse.data}")
+                        onSuccess(uploadFiles)
+
+                    } else {
+                        Log.e("uploadFiles","uploadFiles Failed")
+                    }
+                } else {
+                    Log.e("uploadFiles","uploadFiles request failed: ${response.code()}")
+                    onError("uploadFiles request failed: ${response.code()}")
+                }
+            } catch (e: HttpException) {
+                Log.e ("uploadFiles…","uploadFiles HTTP request failed: ${e.message}")
+                onError("uploadFiles HTTP request failed: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("uploadFiles","uploadFiles request failed due to exception: ${e.message}")
+                onError("uploadFiles request failed due to exception: ${e.message}")
+            }
+        }
+    }
+
+
+
+    /**
+     * 新增商品信息
+     */
+    fun addGoodsInfo(
+         addr: String,
+         content: String,
+         imageCode: Int,
+         price: Int,
+         typeId: Int,
+         typeName: String,
+         userId: Int,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+
+                val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
+                    apiService.addGoodsInfo(AddGoodsRequest(addr,content,imageCode,price,typeId,typeName,userId)).execute()
+                }
+
+                if (response.isSuccessful) {
+                    val addGoodsInfoResponse = response.body()
+                    Log.d("addGoodsInfo","addGoodsInfo ${addGoodsInfoResponse}")
+                    if (addGoodsInfoResponse != null && addGoodsInfoResponse.code == 200) {
+                        Log.d("addGoodsInfo","addGoodsInfo Sucussee${addGoodsInfoResponse.data}")
+                        onSuccess()
+                    } else {
+                        Log.e("addGoodsInfo","addGoodsInfo Failed")
+                    }
+                } else {
+                    Log.e("addGoodsInfo","addGoodsInfo request failed: ${response.code()}")
+                    onError("addGoodsInfo request failed: ${response.code()}")
+                }
+            } catch (e: HttpException) {
+                Log.e ("addGoodsInfo…","addGoodsInfo HTTP request failed: ${e.message}")
+                onError("addGoodsInfo HTTP request failed: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("addGoodsInfo","addGoodsInfo request failed due to exception: ${e.message}")
+                onError("addGoodsInfo request failed due to exception: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * 保存商品信息
+     */
+
+    fun saveGoodsInfo(
+        addr: String,
+        content: String,
+        imageCode: Int,
+        price: Int,
+        typeId: Int,
+        typeName: String,
+        userId: Int,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+
+                val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
+                    apiService.saveGoodsInfo(SaveGoodsRequest(addr,content,imageCode,price,typeId,typeName,userId)).execute()
+                }
+
+                if (response.isSuccessful) {
+                    val saveGoodsInfoResponse = response.body()
+
+                    if (saveGoodsInfoResponse != null && saveGoodsInfoResponse.code == 200) {
+                        Log.d("saveGoodsInfo","saveGoodsInfo Sucussee${saveGoodsInfoResponse.data}")
+                        onSuccess()
+                    } else {
+                        Log.e("saveGoodsInfo","saveGoodsInfo Failed")
+                    }
+                } else {
+                    Log.e("saveGoodsInfo","saveGoodsInfo request failed: ${response.code()}")
+                    onError("saveGoodsInfo request failed: ${response.code()}")
+                }
+            } catch (e: HttpException) {
+                Log.e ("saveGoodsInfo…","saveGoodsInfo HTTP request failed: ${e.message}")
+                onError("saveGoodsInfo HTTP request failed: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("saveGoodsInfo","saveGoodsInfo request failed due to exception: ${e.message}")
+                onError("saveGoodsInfo request failed due to exception: ${e.message}")
+            }
+        }
+    }
+
+
+
+
 }
 

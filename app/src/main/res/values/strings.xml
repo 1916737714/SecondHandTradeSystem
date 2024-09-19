@@ -12,5 +12,41 @@
     <string name="str_main_title_message">消息</string>
     <string name="str_main_title_mine">我的</string>
     <string name="str_main_title_add"> </string>
+
+    <!-- 省份和直辖市 -->
+    <string name="province_beijing">北京</string>
+    <string name="province_shanghai">上海</string>
+    <string name="province_tianjin">天津</string>
+    <string name="province_chongqing">重庆</string>
+    <string name="province_hebei">河北省</string>
+    <string name="province_shanxi">山西省</string>
+    <string name="province_liaoning">辽宁省</string>
+    <string name="province_jilin">吉林省</string>
+    <string name="province_heilongjiang">黑龙江省</string>
+    <string name="province_jiangsu">江苏省</string>
+    <string name="province_zhejiang">浙江省</string>
+    <string name="province_anhui">安徽省</string>
+    <string name="province_fujian">福建省</string>
+    <string name="province_jiangxi">江西省</string>
+    <string name="province_shandong">山东省</string>
+    <string name="province_henan">河南省</string>
+    <string name="province_hubei">湖北省</string>
+    <string name="province_hunan">湖南省</string>
+    <string name="province_guangdong">广东省</string>
+    <string name="province_hainan">海南省</string>
+    <string name="province_sichuan">四川省</string>
+    <string name="province_guizhou">贵州省</string>
+    <string name="province_yunnan">云南省</string>
+    <string name="province_shaanxi">陕西省</string>
+    <string name="province_gansu">甘肃省</string>
+    <string name="province_qinghai">青海省</string>
+    <string name="province_taiwan">台湾省</string>
+    <string name="province_neimenggu">内蒙古自治区</string>
+    <string name="province_guangxi">广西壮族自治区</string>
+    <string name="province_xizang">西藏自治区</string>
+    <string name="province_ningxia">宁夏回族自治区</string>
+    <string name="province_xinjiang">新疆维吾尔自治区</string>
+    <string name="province_hongkong">香港特别行政区</string>
+    <string name="province_macao">澳门特别行政区</string>
   </resources>
 

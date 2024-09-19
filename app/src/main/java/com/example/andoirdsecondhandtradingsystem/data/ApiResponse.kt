@@ -58,65 +58,19 @@ sealed class Data {
         @SerializedName("size") val size: Int,
         @SerializedName("current") val current: Int
     ) : Data()
+
+    //商品类型列表
+    data class goodsType(
+        @SerializedName("id") val id: Int,
+        @SerializedName("type") val type: String
+    )
+    data class goodsTypeList(
+       val GoodsTypeList: List<goodsType>
+    ) : Data()
+
+    //上传文件
+    data class upLoadFile(
+        @SerializedName("imageCode") val imageCode:String,
+        @SerializedName("imageUrlList") val imageUrlList: List<String>
+    ) : Data()
 }
-// 通用的对象类，用于表示 `imageUrlList` 等
-//data class ImageUrl(val placeholder: Any)
-//// 其他数据类型
-//data class DataString(
-//    @SerializedName("appKey") val appKey: String,
-//    @SerializedName("content") val content: String,
-//    @SerializedName("createTime") val createTime: Long,
-//    @SerializedName("id") val id: Long,
-//    @SerializedName("status") val status: Int,
-//    @SerializedName("toUserId") val toUserId: Long,
-//    @SerializedName("userId") val userId: Long
-//) : Data()
-//
-//data class DataObject(val obj: Any) : Data()
-//
-//data class DataList(val list: List<MessageListData>) : Data()
-//
-//data class UserDetails(
-//    @SerializedName("addr") val addr: String,
-//    @SerializedName("avatar") val avatar: String,
-//    @SerializedName("content") val content: String,
-//    @SerializedName("createTime") val createTime: Long,
-//    @SerializedName("id") val id: Long,
-//    @SerializedName("imageCode") val imageCode: Int,
-//    @SerializedName("imageUrlList") val imageUrlList: List<ImageUrl>,
-//    @SerializedName("price") val price: Int,
-//    @SerializedName("status") val status: Int,
-//    @SerializedName("tUserId") val tUserId: Long,
-//    @SerializedName("tuserId") val tuserId: Long,
-//    @SerializedName("typeId") val typeId: Int,
-//    @SerializedName("typeName") val typeName: String,
-//    @SerializedName("username") val username: String
-//) : Data()
-//
-//// 消息数据
-//data class PaginatedData<T>(
-//    @SerializedName("current") val current: Int,
-//    @SerializedName("records") val records: List<T>,
-//    @SerializedName("size") val size: Int,
-//    @SerializedName("total") val total: Int
-//) : Data()
-//
-//data class RevenueData(
-//    @SerializedName("TotalRevenue") val totalRevenue: Int,
-//    @SerializedName("TotalSpending") val totalSpending: Int
-//) : Data()
-//
-//data class TransactionRecord(
-//    @SerializedName("buyerAvatar") val buyerAvatar: String,
-//    @SerializedName("buyerId") val buyerId: Long,
-//    @SerializedName("buyerName") val buyerName: String,
-//    @SerializedName("createTime") val createTime: Long,
-//    @SerializedName("goodsDescription") val goodsDescription: String,
-//    @SerializedName("goodsId") val goodsId: Long,
-//    @SerializedName("id") val id: Long,
-//    @SerializedName("imageUrlList") val imageUrlList: List<ImageUrl>,
-//    @SerializedName("price") val price: Int,
-//    @SerializedName("sellerAvatar") val sellerAvatar: String,
-//    @SerializedName("sellerId") val sellerId: Long,
-//    @SerializedName("sellerName") val sellerName: String
-//) : Data()

@@ -10,12 +10,22 @@ class DataDeserializer : JsonDeserializer<Data?> {
 
         return when {
             json.isJsonArray -> {
-                // 处理 JsonArray 格式的数据
-                val messageList = context.deserialize<List<Data.MessageListData>>(
-                    json,
-                    object : TypeToken<List<Data.MessageListData>>() {}.type
-                )
-                Data.DataWrapper(messageList)
+                val jsonArray = json.asJsonArray
+                if (jsonArray.size() > 0 && jsonArray[0].isJsonObject && jsonArray[0].asJsonObject.has("type")) {
+                    // 处理 GoodsType 格式的数据
+                    val goodsTypeList = context.deserialize<List<Data.goodsType>>(
+                        jsonArray,
+                        object : TypeToken<List<Data.goodsType>>() {}.type
+                    )
+                    Data.goodsTypeList(goodsTypeList)
+                } else {
+                    // 默认处理 MessageListData 格式的数据
+                    val messageList = context.deserialize<List<Data.MessageListData>>(
+                        jsonArray,
+                        object : TypeToken<List<Data.MessageListData>>() {}.type
+                    )
+                    Data.DataWrapper(messageList)
+                }
             }
 
             json.isJsonObject -> {
@@ -24,6 +34,8 @@ class DataDeserializer : JsonDeserializer<Data?> {
                 if (jsonObject.has("records")) {
                     // 如果包含 "records" 字段，则反序列化为 MessageDatail
                     context.deserialize<Data.MessageDatail>(jsonObject, Data.MessageDatail::class.java)
+                }else if (jsonObject.has("imageUrlList")){
+                    context.deserialize<Data.upLoadFile>(jsonObject, Data.upLoadFile::class.java)
                 } else {
                     // 否则，假设是 User 类型
                     context.deserialize<Data.User>(jsonObject, Data.User::class.java)
