@@ -61,29 +61,16 @@ class MainActivity : ComponentActivity() {
                     currentScreen = "Login"
                 }
 
-<<<<<<< HEAD
                 if(isLoggedIn) {
-                    MyApp()
-                }else
-                {
-                    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
-                        // 动画弹簧
-
-                        // 登录
-=======
-                if (isLoggedIn) {
                     user?.let {
-                        MainContent(user = it)
-                    } ?: run {
-                        currentScreen = "Login"
-                        isLoggedIn = false
+                        MyApp(user = it)
                     }
-                } else {
+                }else {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Bottom
                     ) {
->>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
+                        // 动画弹簧
                         AnimatedVisibility(
                             visible = currentScreen == "Login",
                             enter = slideInVertically(initialOffsetY = { it }) + fadeIn(animationSpec = tween(300)),

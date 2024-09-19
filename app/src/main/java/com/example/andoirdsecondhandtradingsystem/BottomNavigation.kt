@@ -27,11 +27,8 @@ import com.example.andoirdsecondhandtradingsystem.data.Data
 
 //底部导航栏
 @Composable
-<<<<<<< HEAD
-fun MainContent(navController1: NavController) {
-=======
-fun MainContent(user: Data.User) {
->>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
+fun MainContent(user: Data.User,navController1: NavController) {
+
     var selectedScreen by remember { mutableStateOf<ScreenPage>(ScreenPage.Home) }
     var topBarTitle by remember { mutableStateOf("Home") }  // 用于存储顶部标题
     val navController = rememberNavController()
@@ -72,11 +69,7 @@ fun MainContent(user: Data.User) {
 
             }
                 when (selectedScreen) {
-<<<<<<< HEAD
                 is ScreenPage.Home -> HomePage(navController1)
-=======
-                is ScreenPage.Home -> HomePage(navController)
->>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
                 is ScreenPage.Love -> Text(text = "Love Screen")
                 is ScreenPage.Capture -> GoodsManage(user)
                 is ScreenPage.Message ->  AppNavigation(navController, selectedScreen,user){showBars = it}

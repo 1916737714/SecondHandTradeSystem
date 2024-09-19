@@ -1,25 +1,10 @@
 package com.example.andoirdsecondhandtradingsystem.HomePage
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-<<<<<<< HEAD
-import androidx.navigation.compose.rememberNavController
-=======
->>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
 import com.example.andoirdsecondhandtradingsystem.R
-import java.util.Locale.Category
 
 @Composable
 fun CategoryTransform(navController: NavController){
@@ -88,11 +73,11 @@ fun CategoryTransform(navController: NavController){
         )
     )
 
-<<<<<<< HEAD
+
 //    PageTransform(navController, products = productsByCategory[selectedCategory.value]?: emptyList())
     GoodsList(navController,products = productsByCategory[selectedCategory.value]?: emptyList())
-=======
-    GoodsList(productsByCategory[selectedCategory.value]?: emptyList(), navController )
->>>>>>> 1051994144d47eaf0dfc54ef22024ecafab044ce
+
+//    GoodsList(productsByCategory[selectedCategory.value]?: emptyList(), navController )
+
 }
 
