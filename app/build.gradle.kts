@@ -86,4 +86,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation ("io.coil-kt:coil-compose:2.0.0")
+    implementation ("io.coil-kt:coil-compose:2.0.0")
+    implementation ("io.coil-kt:coil-compose:1.3.2")
+    implementation ("androidx.compose.material3:material3:1.0.0-beta01")
+    implementation ("androidx.compose.foundation:foundation:1.1.0-alpha03")
 }

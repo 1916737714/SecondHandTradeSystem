@@ -1,31 +1,76 @@
 package com.example.andoirdsecondhandtradingsystem
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.andoirdsecondhandtradingsystem.Mymanage.MyProfile
+import coil.compose.rememberImagePainter
+import com.example.andoirdsecondhandtradingsystem.Mymanage.MyMerchandiseScreen
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.example.androidsecondhandtradingsystem.MyAmount
 import com.example.androidsecondhandtradingsystem.MyMerchandise
-
-import androidx.compose.ui.unit.sp
-
 import com.example.androidsecondhandtradingsystem.MyOrders
 import com.example.androidsecondhandtradingsystem.MySoldItems
+import com.example.andoirdsecondhandtradingsystem.Mymanage.MyProfile
+import com.example.andoirdsecondhandtradingsystem.Mymanage.MyTransaction
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.*
+import java.io.IOException
+
+// 数据模型
+data class TotalAmount(
+    val totalRevenue: Int,
+    val totalSpending: Int
+)
+
+data class ApiResponse<T>(
+    val code: Int,
+    val msg: String,
+    val data: T
+)
 
 @Composable
 fun MineScreen(navController: NavHostController, user: Data.User) {
+    val totalAmount = remember { mutableStateOf<TotalAmount?>(null) }
+    val balance = remember { mutableStateOf(user.money) }
+    val coroutineScope = rememberCoroutineScope()
+
+    // This will ensure that the data is reloaded every time the user navigates to this screen
+    val currentUser = rememberUpdatedState(user)
+
+    LaunchedEffect(currentUser.value) {
+        coroutineScope.launch {
+            val result = fetchTotalAmount(user.id.toString())
+            totalAmount.value = result
+        }
+    }
+
+    fun updateBalanceAndTotalAmount(newBalance: Int) {
+        balance.value = newBalance
+        coroutineScope.launch {
+            val result = fetchTotalAmount(user.id.toString())
+            totalAmount.value = result
+        }
+    }
+
     NavHost(navController = navController, startDestination = "my_data") {
         composable("my_data") {
-            Mydata(navController = navController, user = user)
+            Mydata(navController = navController, user = user, totalAmount.value, balance.value)
         }
         composable("my_profile/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
@@ -33,7 +78,7 @@ fun MineScreen(navController: NavHostController, user: Data.User) {
         }
         composable("my_merchandise/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
-            MyMerchandise(navController = navController, user = user)
+            MyMerchandiseScreen(navController = navController, user = user)
         }
         composable("my_orders/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
@@ -41,93 +86,274 @@ fun MineScreen(navController: NavHostController, user: Data.User) {
         }
         composable("my_amount/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
-            MyAmount(navController = navController, user = user)
+            MyAmount(navController = navController, user = user, onBalanceChanged = { newBalance ->
+                updateBalanceAndTotalAmount(newBalance)
+            })
         }
-        // 新增路由
         composable("my_sold_items/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
             MySoldItems(navController = navController, user = user)
+        }
+        composable("my_transaction/{username}") { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            MyTransaction(navController = navController, user = user)
         }
     }
 }
 
 @Composable
-fun Mydata(navController: NavHostController, user: Data.User) {
+fun Mydata(navController: NavHostController, user: Data.User, totalAmount: TotalAmount?, balance: Int) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF0F0F0))  // 设置背景颜色
+            .background(Color(0xFFF0F0F0))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top
     ) {
-        // 可选的顶部图标或图片
-        Text(
-            text = "当前登录用户名：${user.username}",
-            style = MaterialTheme.typography.titleLarge.copy(
-                color = Color(0xFF333333)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        ) {
+            Image(
+                painter = rememberImagePainter(data = user.avatar),
+                contentDescription = "User Avatar",
+                modifier = Modifier
+                    .size(100.dp)
+                    .padding(end = 16.dp),
+                contentScale = ContentScale.Crop
             )
-        )
-        Spacer(modifier = Modifier.height(24.dp))
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.padding(top = 5.dp) // Added padding to move down UserID and My Profile
+            ) {
+                Text(
+                    text = "用户名：${user.username}",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = Color(0xFF333333)
+                    )
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp), // Added top padding to move down UserID
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = "用户ID：${user.id}",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = Color(0xFF333333)
+                            )
+                        )
+                    }
+                    Button(
+                        onClick = { navController.navigate("my_profile/${user.username}") },
+                        modifier = Modifier
+                            .padding(start = 16.dp, top = 8.dp) // Added top padding to move down My Profile
+                            .height(36.dp)
+                            .width(100.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Text(text = "我的资料", color = Color.White, fontSize = 12.sp)
+                    }
+                }
+            }
+        }
 
-        // 添加按钮
-        Button(
-            onClick = { navController.navigate("my_profile/${user.username}") },
+        totalAmount?.let {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFE0E0E0))
+                    .padding(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "总收入：${it.totalRevenue} 元",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color(0xFF333333)
+                        )
+                    )
+                    Text(
+                        text = "总支出：${it.totalSpending} 元",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color(0xFF333333)
+                        )
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6200EE)),
-            shape = MaterialTheme.shapes.medium
+                .background(Color.White)
+                .padding(16.dp)
         ) {
-            Text(text = "我的资料", color = Color.White, fontSize = 16.sp)
+            Column {
+                Text(
+                    text = "钱包",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = Color(0xFF333333)
+                    ),
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "余额：$balance 元",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color(0xFF333333)
+                        )
+                    )
+                    Button(
+                        onClick = { navController.navigate("my_amount/${user.username}") },
+                        modifier = Modifier.height(48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5722)),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Text(text = "充值", color = Color.White, fontSize = 16.sp)
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(16.dp)
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = { navController.navigate("my_merchandise/${user.username}") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 4.dp)
+                            .height(100.dp), // Adjusted height to make buttons smaller
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White), // Set background to white
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_shopping_bag_24),
+                                contentDescription = null,
+                                tint = Color.Black, // Change icon color to black
+                                modifier = Modifier
+                                    .width(50.dp)  // Set width
+                                    .height(40.dp) // Adjusted height to make icons smaller
+                            )
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(text = "我发布的", color = Color.Black, fontSize = 12.sp) // Adjusted font size
+                        }
+                    }
+                    Button(
+                        onClick = { navController.navigate("my_orders/${user.username}") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 4.dp)
+                            .height(100.dp), // Adjusted height to make buttons smaller
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White), // Set background to white
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_shopping_cart_24),
+                                contentDescription = null,
+                                tint = Color.Black, // Change icon color to black
+                                modifier = Modifier
+                                    .width(50.dp) // Set width
+                                    .height(40.dp) // Adjusted height to make icons smaller
+                            )
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(text = "我购买的", color = Color.Black, fontSize = 12.sp) // Adjusted font size
+                        }
+                    }
+                    Button(
+                        onClick = { navController.navigate("my_sold_items/${user.username}") },
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 4.dp)
+                            .height(100.dp), // Adjusted height to make buttons smaller
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White), // Set background to white
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_monetization_on_24),
+                                contentDescription = null,
+                                tint = Color.Black, // Change icon color to black
+                                modifier = Modifier
+                                    .width(50.dp) // Set width
+                                    .height(40.dp) // Adjusted height to make icons smaller
+                            )
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(text = "我卖出的", color = Color.Black, fontSize = 12.sp) // Adjusted font size
+                        }
+                    }
+                }
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { navController.navigate("my_merchandise/${user.username}") },
+            onClick = { navController.navigate("my_transaction/${user.username}") },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF03DAC5)),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFC107)),
             shape = MaterialTheme.shapes.medium
         ) {
-            Text(text = "我发布的商品", color = Color.White, fontSize = 16.sp)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { navController.navigate("my_orders/${user.username}") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF03A9F4)),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text(text = "我的订单", color = Color.White, fontSize = 16.sp)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { navController.navigate("my_sold_items/${user.username}") }, // 新增的按钮
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)), // 选择一个合适的颜色
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text(text = "我卖出的物品", color = Color.White, fontSize = 16.sp)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = { navController.navigate("my_amount/${user.username}") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5722)),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text(text = "金额充值", color = Color.White, fontSize = 16.sp)
+            Text(text = "我的交易", color = Color.White, fontSize = 16.sp)
         }
     }
+}
+
+// 异步函数获取总收入和总支出
+suspend fun fetchTotalAmount(userId: String): TotalAmount? = withContext(Dispatchers.IO) {
+    val url = "https://api-store.openguet.cn/api/member/tran/trading/allMoney?userId=$userId"
+    val headers = Headers.Builder()
+        .add("appId", "1c92edcbfd42414e8bfee284c6801259")
+        .add("appSecret", "80042819ade5505a74c4cb196258423ed4bb0")
+        .build()
+
+    val request = Request.Builder()
+        .url(url)
+        .headers(headers)
+        .get()
+        .build()
+
+    val client = OkHttpClient()
+    try {
+        val response = client.newCall(request).execute()
+        val body = response.body?.string()
+        if (body != null && response.isSuccessful) {
+            val type = object : TypeToken<ApiResponse<TotalAmount>>() {}.type
+            val apiResponse: ApiResponse<TotalAmount> = Gson().fromJson(body, type)
+            if (apiResponse.code == 200) {
+                return@withContext apiResponse.data
+            }
+        }
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+    return@withContext null
 }

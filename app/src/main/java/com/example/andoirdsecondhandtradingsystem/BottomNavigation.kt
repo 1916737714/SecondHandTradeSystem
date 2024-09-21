@@ -74,7 +74,7 @@ fun MainContent(user: Data.User,navController1: NavController) {
                 is ScreenPage.Capture -> GoodsManage(user)
                 is ScreenPage.Message ->  AppNavigation(navController, selectedScreen,user){showBars = it}
     //                        MessageScreen(navController)
-                is ScreenPage.Mine -> DisplayUserInfo(user = user)
+                    is ScreenPage.Mine -> MineScreen(navController = navController, user = user)
 //                    Text(text = "Mine Screen")
             }
         }

@@ -64,20 +64,7 @@ data class ApiResponseBody<T>(
 )
 
 @Composable
-fun MyMerchandise(navController: NavController, user: Data.User) {
-    // 使用remember保存商品列表的状态
-    var merchandiseList by remember { mutableStateOf(listOf<Merchandise>()) }
-    var errorMessage by remember { mutableStateOf("") }
-
-    // 在Composable中启动网络请求
-    LaunchedEffect(Unit) {
-        fetchMerchandise(user, { list ->
-            merchandiseList = list
-        }, { error ->
-            errorMessage = error
-        })
-    }
-
+fun MyMerchandise(navController: NavController, merchandiseList: List<Merchandise>, errorMessage: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -108,7 +95,6 @@ fun MyMerchandise(navController: NavController, user: Data.User) {
         }
     }
 }
-
 // 获取商品数据的网络请求
 fun fetchMerchandise(
     user: Data.User,

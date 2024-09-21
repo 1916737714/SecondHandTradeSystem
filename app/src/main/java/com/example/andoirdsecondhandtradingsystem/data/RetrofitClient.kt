@@ -19,8 +19,8 @@ class HeaderInterceptor : Interceptor {
         val requestBuilder = original.newBuilder()
             .header("Accept", "application/json, text/plain, */*")
             .header("Content-Type", "application/json")
-            .header("appId", "e1bdf675e771485192e10e1e4396f1ec")
-            .header("appSecret", "172804bfe98ab0c6649e2938c8370cd6e010a")
+            .header("appId", "1c92edcbfd42414e8bfee284c6801259")
+            .header("appSecret", "80042819ade5505a74c4cb196258423ed4bb0")
         val request = requestBuilder.build()
         return chain.proceed(request)
     }
