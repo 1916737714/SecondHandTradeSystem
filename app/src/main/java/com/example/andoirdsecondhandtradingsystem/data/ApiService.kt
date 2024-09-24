@@ -75,7 +75,7 @@ data class SendMessageRequest(
 data class AddGoodsRequest(
     val addr: String,
     val content: String,
-    val imageCode: Int,
+    val imageCode: String,
     val price: Int,
     val typeId: Int,
     val typeName: String,
@@ -85,7 +85,7 @@ data class AddGoodsRequest(
 data class SaveGoodsRequest (
     val addr: String,
     val content: String,
-    val imageCode: Int,
+    val imageCode: String,
     val price: Int,
     val typeId: Int,
     val typeName: String,

@@ -441,7 +441,7 @@ class AuthViewModel : ViewModel() {
     fun addGoodsInfo(
          addr: String,
          content: String,
-         imageCode: Int,
+         imageCode: String,
          price: Int,
          typeId: Int,
          typeName: String,
@@ -486,7 +486,7 @@ class AuthViewModel : ViewModel() {
     fun saveGoodsInfo(
         addr: String,
         content: String,
-        imageCode: Int,
+        imageCode: String,
         price: Int,
         typeId: Int,
         typeName: String,
