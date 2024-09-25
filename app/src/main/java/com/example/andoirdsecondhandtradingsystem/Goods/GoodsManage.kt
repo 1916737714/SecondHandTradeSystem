@@ -66,7 +66,7 @@ fun GoodsManage(user: Data.User) {
         }
         when (selectedTab) {
             0 -> PublishProductScreen(user)
-            1 -> PendingProductScreen()
+            1 -> PendingProductScreen(user)
         }
     }
 }

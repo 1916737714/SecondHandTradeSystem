@@ -32,11 +32,32 @@ class DataDeserializer : JsonDeserializer<Data?> {
                 val jsonObject = json.asJsonObject
 
                 if (jsonObject.has("records")) {
-                    // 如果包含 "records" 字段，则反序列化为 MessageDatail
-                    context.deserialize<Data.MessageDatail>(jsonObject, Data.MessageDatail::class.java)
+                    //判断record是否有tUserId字段
+                    val recordsArray = jsonObject.getAsJsonArray("records")
+                    var containsTUserId = false
+
+                    for (element in recordsArray) {
+                        val recordObject = element.asJsonObject
+                        if (recordObject.has("tUserId")) {
+                            containsTUserId = true
+                            break
+                        }
+                    }
+
+                    if (containsTUserId) {
+                        //反序列化成已保存商品信息
+                        context.deserialize<Data.saveGoodsList>(jsonObject, Data.saveGoodsList::class.java)
+                    } else {
+                        //反序列成消息详情
+                        context.deserialize<Data.MessageDatail>(jsonObject, Data.MessageDatail::class.java)
+                    }
+
+
                 }else if (jsonObject.has("imageUrlList")){
+                    //反序列成上传文件
                     context.deserialize<Data.upLoadFile>(jsonObject, Data.upLoadFile::class.java)
-                } else {
+                }
+                else {
                     // 否则，假设是 User 类型
                     context.deserialize<Data.User>(jsonObject, Data.User::class.java)
                 }
@@ -47,29 +68,3 @@ class DataDeserializer : JsonDeserializer<Data?> {
     }
 }
 
-
-
-//        return when {
-//            jsonObject.has("appKey") && jsonObject.has("username") -> {
-//                context.deserialize(jsonObject, Data.User::class.java)
-//            }
-//            jsonObject.has("totalRevenue") && jsonObject.has("totalSpending") -> {
-//                context.deserialize(jsonObject, Data.RevenueData::class.java)
-//            }
-//            jsonObject.has("buyerAvatar") && jsonObject.has("sellerAvatar") -> {
-//                context.deserialize(jsonObject, Data.TransactionRecord::class.java)
-//            }
-//            jsonObject.has("current") && jsonObject.has("total") -> {
-//                context.deserialize(jsonObject, Data.PaginatedData::class.java)
-//            }
-//            jsonObject.has("content") -> {
-//                context.deserialize(jsonObject, Data.DataString::class.java)
-//            }
-//            jsonObject.has("fromUserId") && jsonObject.has("username") && jsonObject.has("unReadNum") -> {
-//                context.deserialize(jsonObject, Data.MessageListData::class.java)
-//            }
-//            jsonObject.has("data") && jsonObject.get("data").isJsonArray -> {
-//                context.deserialize(jsonObject, Data.MessageListDataArray::class.java)
-//            }
-//            else -> null
-//        }

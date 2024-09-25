@@ -524,8 +524,46 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 获取用户已保存的商品列表
+     */
 
+    fun getsaveGoodsList(
+        userId: Int,
+        current: Int,
+        onSuccess: (List<Data.saveGoodsInfo>) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
 
+                val response: Response<ApiResponse> = withContext(Dispatchers.IO) {
+                    apiService.getSavedGoodsList(userId,current).execute()
+                }
+
+                if (response.isSuccessful) {
+                    val saveGoodsListResponse = response.body()
+
+                    if (saveGoodsListResponse != null && saveGoodsListResponse.code == 200) {
+                        val saveGoodsList = (saveGoodsListResponse.data as Data.saveGoodsList).records
+                        Log.d("getsaveGoodsList","getsaveGoodsList Sucussee${saveGoodsListResponse.data}")
+                        onSuccess(saveGoodsList)
+                    } else {
+                        Log.e("getsaveGoodsList","getsaveGoodsList Failed")
+                    }
+                } else {
+                    Log.e("getsaveGoodsList","getsaveGoodsList request failed: ${response.code()}")
+                    onError("getsaveGoodsList request failed: ${response.code()}")
+                }
+            } catch (e: HttpException) {
+                Log.e ("getsaveGoodsList…","getsaveGoodsList HTTP request failed: ${e.message}")
+                onError("getsaveGoodsList HTTP request failed: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("getsaveGoodsList","getsaveGoodsList request failed due to exception: ${e.message}")
+                onError("getsaveGoodsList request failed due to exception: ${e.message}")
+            }
+        }
+    }
 
 }
 
