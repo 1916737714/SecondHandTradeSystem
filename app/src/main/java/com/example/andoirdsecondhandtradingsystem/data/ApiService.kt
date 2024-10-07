@@ -53,6 +53,10 @@ interface ApiService {
     @POST("api/member/tran/goods/save")
     fun saveGoodsInfo(@Body saveGoodsRequest: SaveGoodsRequest): Call<ApiResponse>
 
+    //获取用户已保存的商品列表
+    @GET("api/member/tran/goods/save")
+    fun getSavedGoodsList(@Query("userId") userId: Int,@Query("current") current: Int): Call<ApiResponse>
+
 }
 
 
@@ -75,7 +79,7 @@ data class SendMessageRequest(
 data class AddGoodsRequest(
     val addr: String,
     val content: String,
-    val imageCode: Int,
+    val imageCode: String,
     val price: Int,
     val typeId: Int,
     val typeName: String,
@@ -85,7 +89,7 @@ data class AddGoodsRequest(
 data class SaveGoodsRequest (
     val addr: String,
     val content: String,
-    val imageCode: Int,
+    val imageCode: String,
     val price: Int,
     val typeId: Int,
     val typeName: String,

@@ -73,4 +73,35 @@ sealed class Data {
         @SerializedName("imageCode") val imageCode:String,
         @SerializedName("imageUrlList") val imageUrlList: List<String>
     ) : Data()
+
+    //用户保存商品列表
+    // 保存商品信息
+    data class saveGoodsInfo(
+        @SerializedName("addr") val addr: String,
+        @SerializedName("appIsShare") val appIsShare: Int,
+        @SerializedName("appKey") val appKey: String,
+        @SerializedName("avatar") val avatar: String,
+        @SerializedName("content") val content: String,
+        @SerializedName("createTime") val createTime: String,
+        @SerializedName("id") val id: Int,
+        @SerializedName("imageCode") val imageCode: String,
+        @SerializedName("imageUrlList") val imageUrlList: List<String>,
+        @SerializedName("price") val price: Int,
+        @SerializedName("status") val status: Int,
+        @SerializedName("tUserId") val tUserId: Int,
+        @SerializedName("tuserId") val tuserId: Int,
+        @SerializedName("typeId") val typeId: Int,
+        @SerializedName("typeName") val typeName: String,
+        @SerializedName("username") val username: String
+    )
+
+    //保存商品信息列表
+    data class saveGoodsList(
+        @SerializedName("records") val records: List<saveGoodsInfo>,
+        @SerializedName("total") val total: Int,
+        @SerializedName("size") val size: Int,
+        @SerializedName("current") val current: Int
+    ) : Data()
+
+
 }
