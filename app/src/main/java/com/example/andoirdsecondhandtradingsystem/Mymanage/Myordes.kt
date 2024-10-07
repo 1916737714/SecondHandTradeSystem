@@ -4,6 +4,7 @@ import android.os.NetworkOnMainThreadException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,6 +18,10 @@ import coil.compose.AsyncImage
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import okhttp3.*
 import java.io.IOException
 import java.lang.reflect.Type
@@ -31,7 +36,7 @@ data class Order(
     val createTime: String,
     val sellerName: String,
     val buyerName: String?,
-    val sellerAvatar: String,
+    val sellerAvatar: String?,
     val buyerAvatar: String?,
     val goodsDescription: String,
     val imageUrlList: List<String>
@@ -47,7 +52,7 @@ data class OrderRecord(
     val createTime: String,
     val sellerName: String,
     val buyerName: String?,
-    val sellerAvatar: String,
+    val sellerAvatar: String?,
     val buyerAvatar: String?,
     val goodsDescription: String,
     val imageUrlList: List<String>
@@ -69,17 +74,52 @@ data class ApiResponse<T>(
 
 @Composable
 fun MyOrders(navController: NavController, user: Data.User) {
-    // 使用remember保存订单列表的状态
+    // 使用 remember 保存订单列表的状态
     var orderList by remember { mutableStateOf(listOf<Order>()) }
     var errorMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var currentPage by remember { mutableStateOf(1) }
+    var hasMore by remember { mutableStateOf(true) }
+
+    val listState = rememberLazyListState()
+
+    // 获取订单数据
+    fun fetchOrders(page: Int) {
+        if (isLoading || !hasMore) return
+
+        isLoading = true
+        fetchOrders(user, page, { list, total ->
+            if (page == 1) {
+                orderList = list
+            } else {
+                orderList = orderList + list
+            }
+            hasMore = orderList.size < total
+            isLoading = false
+        }, { error ->
+            errorMessage = error
+            isLoading = false
+        })
+    }
 
     // 在Composable中启动网络请求
     LaunchedEffect(Unit) {
-        fetchOrders(user, { list ->
-            orderList = list
-        }, { error ->
-            errorMessage = error
-        })
+        fetchOrders(1)
+    }
+
+    // 监听列表滚动事件以实现分页加载
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo }
+            .map { it.visibleItemsInfo }
+            .filter { it.isNotEmpty() }
+            .map { it.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .collect { lastVisibleItemIndex ->
+                if (lastVisibleItemIndex == orderList.lastIndex && !isLoading && hasMore) {
+                    currentPage += 1
+                    fetchOrders(currentPage)
+                }
+            }
     }
 
     Column(
@@ -103,10 +143,16 @@ fun MyOrders(navController: NavController, user: Data.User) {
             Text(text = errorMessage, color = Color.Red)
         } else {
             LazyColumn(
+                state = listState,
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(orderList) { order ->
                     OrderItem(order)
+                }
+                item {
+                    if (isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                    }
                 }
             }
         }
@@ -116,11 +162,12 @@ fun MyOrders(navController: NavController, user: Data.User) {
 // 获取订单数据的网络请求
 fun fetchOrders(
     user: Data.User,
-    onSuccess: (List<Order>) -> Unit,
+    page: Int,
+    onSuccess: (List<Order>, Int) -> Unit,
     onError: (String) -> Unit
 ) {
     val gson = Gson()
-    val url = "https://api-store.openguet.cn/api/member/tran/trading/buy?userId=${user.id}" // 修改URL参数
+    val url = "https://api-store.openguet.cn/api/member/tran/trading/buy?userId=${user.id}&current=$page&size=10" // 修改URL参数
 
     val headers = Headers.Builder()
         .add("appId", "1c92edcbfd42414e8bfee284c6801259")
@@ -165,7 +212,7 @@ fun fetchOrders(
                                 imageUrlList = record.imageUrlList
                             )
                         }
-                        onSuccess(orderList)
+                        onSuccess(orderList, dataResponseBody.data.total)
                     } else {
                         onError("请求失败: ${dataResponseBody.msg}")
                     }

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.andoirdsecondhandtradingsystem.Goods.GoodsManage
+import com.example.andoirdsecondhandtradingsystem.Home.Home
 import com.example.andoirdsecondhandtradingsystem.Message.AppNavigation
 import com.example.andoirdsecondhandtradingsystem.data.Data
 
@@ -69,7 +70,7 @@ fun MainContent(user: Data.User,navController1: NavController) {
 
             }
                 when (selectedScreen) {
-                is ScreenPage.Home -> HomePage(navController1)
+                    is ScreenPage.Home -> com.example.andoirdsecondhandtradingsystem.Home.AppNavigation(navController = navController, user = user)
                 is ScreenPage.Love -> Text(text = "Love Screen")
                 is ScreenPage.Capture -> GoodsManage(user)
                 is ScreenPage.Message ->  AppNavigation(navController, selectedScreen,user){showBars = it}

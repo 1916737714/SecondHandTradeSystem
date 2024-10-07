@@ -60,7 +60,7 @@ fun MyAmount(navController: NavController, user: Data.User, onBalanceChanged: (I
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-                .background(Color.White, RoundedCornerShape(8.dp))
+                .background(Color.LightGray, RoundedCornerShape(8.dp)) // 更明显的背景色
                 .padding(16.dp),
             textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
             keyboardOptions = KeyboardOptions.Default.copy(
@@ -92,7 +92,11 @@ fun MyAmount(navController: NavController, user: Data.User, onBalanceChanged: (I
                     Toast.makeText(context, "请输入充值金额", Toast.LENGTH_SHORT).show()
                 }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFFFD700), // 淡黄色
+                contentColor = Color.Black
+            )
         ) {
             Text("立即充值")
         }

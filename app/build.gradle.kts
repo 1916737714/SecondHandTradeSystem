@@ -74,7 +74,8 @@ dependencies {
     implementation(libs.androidx.emoji2.bundled)
     implementation(libs.androidx.compose.material)
     implementation(libs.material)
-    implementation(libs.androidx.runtime.livedata)//表情包
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.paging.compose.android)//表情包
 
 
 
@@ -90,4 +91,22 @@ dependencies {
     implementation ("io.coil-kt:coil-compose:1.3.2")
     implementation ("androidx.compose.material3:material3:1.0.0-beta01")
     implementation ("androidx.compose.foundation:foundation:1.1.0-alpha03")
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.24.7-alpha")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation ("com.google.code.gson:gson:2.8.7")
+    implementation ("io.coil-kt:coil-compose:1.2.2")
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.14.0")
+    implementation ("androidx.compose.ui:ui:1.0.0")
+    implementation ("androidx.compose.material3:material3:1.0.0")
+    implementation ("androidx.activity:activity-compose:1.3.1")
+    implementation ("androidx.navigation:navigation-compose:2.4.0-alpha10")
+// 网络请求框架 okhttp3
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
+// 用来解析json
+    implementation ("com.google.code.gson:gson:2.9.0")
+    implementation ("com.google.accompanist:accompanist-swiperefresh:<version>")
+
+
 }

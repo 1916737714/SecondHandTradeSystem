@@ -102,7 +102,7 @@ class AuthViewModel : ViewModel() {
 
                             // 设置默认头像和密码
                             if (user != null) {
-                                user.avatar = "https://guet-lab.oss-cn-hangzhou.aliyuncs.com/api/2024/09/11/f95a65cc-afa1-4383-be5f-193b7ef64eeb.jpg"
+
                                 user.password = password
                             }
 
