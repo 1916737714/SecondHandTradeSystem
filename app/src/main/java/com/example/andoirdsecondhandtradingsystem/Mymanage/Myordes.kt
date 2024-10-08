@@ -2,19 +2,27 @@ package com.example.androidsecondhandtradingsystem
 
 import android.os.NetworkOnMainThreadException
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.andoirdsecondhandtradingsystem.Home.AppNavigation4
+import com.example.andoirdsecondhandtradingsystem.Home.ManageProductScreen
+import com.example.andoirdsecondhandtradingsystem.Home.ProductManage
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -73,8 +81,23 @@ data class ApiResponse<T>(
 )
 
 @Composable
+fun AppNavigation2(navController: NavController, user: Data.User) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            MyOrders(navController, user)
+        }
+        composable("appNavigation4/{goodsId}") { backStackEntry ->
+            val goodsId = backStackEntry.arguments?.getString("goodsId")
+            goodsId?.let {
+                AppNavigation4(navController, user, it)
+            }
+        }
+    }
+}
+
+@Composable
 fun MyOrders(navController: NavController, user: Data.User) {
-    // 使用 remember 保存订单列表的状态
     var orderList by remember { mutableStateOf(listOf<Order>()) }
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -83,7 +106,6 @@ fun MyOrders(navController: NavController, user: Data.User) {
 
     val listState = rememberLazyListState()
 
-    // 获取订单数据
     fun fetchOrders(page: Int) {
         if (isLoading || !hasMore) return
 
@@ -102,12 +124,10 @@ fun MyOrders(navController: NavController, user: Data.User) {
         })
     }
 
-    // 在Composable中启动网络请求
     LaunchedEffect(Unit) {
         fetchOrders(1)
     }
 
-    // 监听列表滚动事件以实现分页加载
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo }
             .map { it.visibleItemsInfo }
@@ -147,7 +167,7 @@ fun MyOrders(navController: NavController, user: Data.User) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(orderList) { order ->
-                    OrderItem(order)
+                    OrderItem(order, navController)
                 }
                 item {
                     if (isLoading) {
@@ -159,7 +179,6 @@ fun MyOrders(navController: NavController, user: Data.User) {
     }
 }
 
-// 获取订单数据的网络请求
 fun fetchOrders(
     user: Data.User,
     page: Int,
@@ -167,7 +186,7 @@ fun fetchOrders(
     onError: (String) -> Unit
 ) {
     val gson = Gson()
-    val url = "https://api-store.openguet.cn/api/member/tran/trading/buy?userId=${user.id}&current=$page&size=10" // 修改URL参数
+    val url = "https://api-store.openguet.cn/api/member/tran/trading/buy?userId=${user.id}&current=$page&size=10"
 
     val headers = Headers.Builder()
         .add("appId", "1c92edcbfd42414e8bfee284c6801259")
@@ -226,7 +245,7 @@ fun fetchOrders(
 }
 
 @Composable
-fun OrderItem(order: Order) {
+fun OrderItem(order: Order, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,20 +254,26 @@ fun OrderItem(order: Order) {
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .clickable { navController.navigate("appNavigation4/${order.goodsId}") },
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
                 model = order.imageUrlList.firstOrNull(),
                 contentDescription = order.goodsDescription,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(80.dp)
                     .background(Color.Gray)
+                    .fillMaxSize()
             )
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = order.goodsDescription,
                     style = MaterialTheme.typography.bodyLarge.copy(
@@ -270,6 +295,10 @@ fun OrderItem(order: Order) {
                     )
                 )
             }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+
         }
     }
 }

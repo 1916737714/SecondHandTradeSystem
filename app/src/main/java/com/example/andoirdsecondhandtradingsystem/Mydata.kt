@@ -19,7 +19,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import coil.compose.rememberImagePainter
-//import com.example.andoirdsecondhandtradingsystem.Mymanage.MyMerchandiseScreen
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.example.androidsecondhandtradingsystem.MyAmount
 import com.example.androidsecondhandtradingsystem.MyMerchandise
@@ -28,6 +27,8 @@ import com.example.androidsecondhandtradingsystem.MySoldItems
 import com.example.andoirdsecondhandtradingsystem.Mymanage.MyProfile
 import com.example.andoirdsecondhandtradingsystem.Mymanage.MyTransaction
 import com.example.androidsecondhandtradingsystem.AppNavigation1
+import com.example.androidsecondhandtradingsystem.AppNavigation2
+import com.example.androidsecondhandtradingsystem.AppNavigation3
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import java.io.IOException
 
-// 数据模型
 data class TotalAmount(
     val totalRevenue: Int,
     val totalSpending: Int
@@ -54,7 +54,6 @@ fun MineScreen(navController: NavHostController, user: Data.User) {
     val balance = remember { mutableStateOf(user.money) }
     val coroutineScope = rememberCoroutineScope()
 
-    // This will ensure that the data is reloaded every time the user navigates to this screen
     val currentUser = rememberUpdatedState(user)
 
     LaunchedEffect(currentUser.value) {
@@ -74,7 +73,15 @@ fun MineScreen(navController: NavHostController, user: Data.User) {
 
     NavHost(navController = navController, startDestination = "my_data") {
         composable("my_data") {
-            Mydata(navController = navController, user = user, totalAmount.value, balance.value)
+            Mydata(
+                navController = navController,
+                user = user,
+                totalAmount = totalAmount.value,
+                balance = balance.value,
+                usernameFontSize = 24,
+                userIdFontSize = 18,
+                totalAmountFontSize = 18
+            )
         }
         composable("my_profile/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
@@ -86,7 +93,7 @@ fun MineScreen(navController: NavHostController, user: Data.User) {
         }
         composable("my_orders/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
-            MyOrders(navController = navController, user = user)
+            AppNavigation2(navController = navController, user = user)
         }
         composable("my_amount/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
@@ -96,7 +103,7 @@ fun MineScreen(navController: NavHostController, user: Data.User) {
         }
         composable("my_sold_items/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
-            MySoldItems(navController = navController, user = user)
+            AppNavigation3(navController = navController, user = user)
         }
         composable("my_transaction/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
@@ -106,7 +113,15 @@ fun MineScreen(navController: NavHostController, user: Data.User) {
 }
 
 @Composable
-fun Mydata(navController: NavHostController, user: Data.User, totalAmount: TotalAmount?, balance: Int) {
+fun Mydata(
+    navController: NavHostController,
+    user: Data.User,
+    totalAmount: TotalAmount?,
+    balance: Int,
+    usernameFontSize: Int = 20,
+    userIdFontSize: Int = 16,
+    totalAmountFontSize: Int = 16
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -131,7 +146,7 @@ fun Mydata(navController: NavHostController, user: Data.User, totalAmount: Total
                     painter = rememberImagePainter(data = user.avatar),
                     contentDescription = "User Avatar",
                     modifier = Modifier
-                        .size(100.dp)
+                        .size(120.dp)
                         .padding(end = 16.dp)
                         .clip(RoundedCornerShape(50.dp))
                         .clickable { navController.navigate("my_profile/${user.username}") },
@@ -145,7 +160,8 @@ fun Mydata(navController: NavHostController, user: Data.User, totalAmount: Total
                     Text(
                         text = "用户名：${user.username}",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            color = Color(0xFF333333)
+                            color = Color(0xFF333333),
+                            fontSize = 22.sp
                         )
                     )
                     Row(
@@ -159,7 +175,8 @@ fun Mydata(navController: NavHostController, user: Data.User, totalAmount: Total
                             Text(
                                 text = "用户ID：${user.id}",
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    color = Color(0xFF333333)
+                                    color = Color(0xFF333333),
+                                    fontSize = 13.sp
                                 )
                             )
                         }
@@ -184,13 +201,15 @@ fun Mydata(navController: NavHostController, user: Data.User, totalAmount: Total
                     Text(
                         text = "总收入：${it.totalRevenue} 元",
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            color = Color(0xFF333333)
+                            color = Color(0xFF333333),
+                            fontSize = 15.sp
                         )
                     )
                     Text(
                         text = "总支出：${it.totalSpending} 元",
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            color = Color(0xFF333333)
+                            color = Color(0xFF333333),
+                            fontSize = 15.sp
                         )
                     )
                 }
@@ -284,7 +303,8 @@ fun Mydata(navController: NavHostController, user: Data.User, totalAmount: Total
                                 painter = painterResource(id = R.drawable.baseline_shopping_cart_24),
                                 contentDescription = null,
                                 tint = Color.Black,
-                                modifier = Modifier
+                                modifier = Modifier.width(50.dp)
+                                    .height(40.dp)
                             )
                             Spacer(modifier = Modifier.height(5.dp))
                             Text(text = "我购买的", color = Color.Black, fontSize = 12.sp)
@@ -320,7 +340,6 @@ fun Mydata(navController: NavHostController, user: Data.User, totalAmount: Total
     }
 }
 
-// 异步函数获取总收入和总支出
 suspend fun fetchTotalAmount(userId: String): TotalAmount? = withContext(Dispatchers.IO) {
     val url = "https://api-store.openguet.cn/api/member/tran/trading/allMoney?userId=$userId"
     val headers = Headers.Builder()

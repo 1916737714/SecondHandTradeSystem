@@ -107,6 +107,7 @@ dependencies {
 // 用来解析json
     implementation ("com.google.code.gson:gson:2.9.0")
     implementation ("com.google.accompanist:accompanist-swiperefresh:<version>")
+    implementation("io.coil-kt:coil-compose:2.0.0")
 
 
 }

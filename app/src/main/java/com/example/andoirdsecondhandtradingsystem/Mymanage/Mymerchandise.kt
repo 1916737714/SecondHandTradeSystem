@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -234,9 +235,11 @@ fun MerchandiseItem(merchandise: Merchandise, navController: NavController) {
             AsyncImage(
                 model = merchandise.imageUrlList.firstOrNull(),
                 contentDescription = merchandise.content,
+                contentScale = ContentScale.Crop, // Ensure the image scales properly
                 modifier = Modifier
                     .size(80.dp)
                     .background(Color.Gray)
+                    .fillMaxSize() // Ensure the image fills the available space
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -268,11 +271,7 @@ fun MerchandiseItem(merchandise: Merchandise, navController: NavController) {
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Button(
-                onClick = { navController.navigate("goodsManage/${merchandise.id}") }
-            ) {
-                Text("详情")
-            }
+
         }
     }
 }
