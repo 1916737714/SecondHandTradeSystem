@@ -3,6 +3,7 @@ package com.example.andoirdsecondhandtradingsystem.HomePage
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavController
+import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,7 +13,7 @@ import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.google.gson.Gson
 
 @Composable
-fun MyApp(user: Data.User?){
+fun MyApp(user: Data.User){
     val navController= rememberNavController()
     NavHost(navController = navController, startDestination = "mainContent"){
         composable("mainContent"){
@@ -25,6 +26,11 @@ fun MyApp(user: Data.User?){
             val productJson=backStackEntry.arguments?.getString("productJson")
             val product=Gson().fromJson(productJson,Product::class.java)
             GoodsDetail(navController,product = product)
+        }
+        composable("searchResult?query={query}"){
+            backStackEntry->
+            val query = backStackEntry.arguments?.getString("query")?:""
+            SearchResult(user = user, navController = navController, searchText =query )
         }
     }
 }

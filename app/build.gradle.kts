@@ -74,8 +74,11 @@ dependencies {
     implementation(libs.androidx.emoji2.bundled)
     implementation(libs.androidx.compose.material)
     implementation(libs.material)
-    implementation(libs.androidx.runtime.livedata)//表情包
-
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.firebase.crashlytics.buildtools)//表情包
+    implementation ("com.google.code.gson:gson:2.9.1")
+    implementation ("com.google.accompanist:accompanist-pager:0.28.0") // 确保使用最新版本
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.28.0")
 
 
     testImplementation(libs.junit)
