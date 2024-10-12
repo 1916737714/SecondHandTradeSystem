@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.*
+
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomAppBar
@@ -20,7 +23,17 @@ import androidx.navigation.NavController
 import com.example.andoirdsecondhandtradingsystem.R
 import com.example.andoirdsecondhandtradingsystem.TopBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.wear.compose.material.HorizontalPageIndicator
+import coil.compose.rememberImagePainter
+//import com.google.accompanist.pager.*
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
+//@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun GoodsDetail(navController: NavController,product: Product){
 
@@ -46,8 +59,8 @@ fun GoodsDetail(navController: NavController,product: Product){
                         }
                         Spacer(modifier = Modifier.weight(1f))
 
-                        Button("聊一聊", modifier = Modifier.weight(1f))
-                        Button("我想要",modifier=Modifier.weight(1f))
+                        Button("聊一聊", modifier = Modifier.weight(1f), onClick = {})
+                        Button("立即购买",modifier=Modifier.weight(1f), onClick = {})
                     }
                 })
 
@@ -56,14 +69,46 @@ fun GoodsDetail(navController: NavController,product: Product){
             Column(modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(innnerPadding)){
-    Text(
-        text = product.publisher
-    )
-    DetailImage(product = product)
-    Text(text = product.description)
-    Text(text = "评论信息：")
-    Text(text = "好吃爱吃，太好吃了哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈")
-    Text(text = "爱吃爱吃爱吃啊爱吃爱吃爱吃哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈git")
+                    Text(
+                        text = product.username
+                    )
+                if(product.imageUrlList.isEmpty()){
+                    Image(painter = painterResource(id = R.drawable.baseline_crop_original_24),
+                        modifier = Modifier.fillMaxSize() ,
+                        contentDescription = "默认图片",
+                        contentScale = ContentScale.Crop)
+                }else{
+//                val pagerState = rememberPagerState()
+//                HorizontalPager(
+//                    count = product.imageUrlList.size,
+//                    state = pagerState,
+//                    modifier = Modifier.fillMaxWidth()
+//                    ) {page->
+//                            Image(
+//                                painter = rememberImagePainter(product.imageUrlList[page]),
+//                                contentDescription = null,
+//                                modifier = Modifier.fillMaxSize(),
+//                                contentScale = ContentScale.Crop
+//                            )
+//                }
+//
+//               HorizontalPagerIndicator(
+//                    pagerState=pagerState,
+//                    modifier= Modifier
+//                        .align(Alignment.CenterHorizontally)
+//                        .padding(16.dp)
+//                )
+                    Image(painter = rememberImagePainter(data = product.imageUrlList[0]),
+                        modifier = Modifier.fillMaxSize() ,
+                        contentDescription = "默认图片",
+                        contentScale = ContentScale.Crop)
+                }
+
+                Text(text = "￥：${product.price}",
+                    modifier = Modifier,
+                    color = Color.Red ,
+                    style = TextStyle(fontSize = 18.sp)
+                    )
 }
         }
     )

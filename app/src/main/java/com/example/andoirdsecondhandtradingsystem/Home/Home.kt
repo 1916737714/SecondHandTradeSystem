@@ -1,6 +1,8 @@
 package com.example.andoirdsecondhandtradingsystem.Home
 
+import android.content.Context
 import android.os.NetworkOnMainThreadException
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,10 +11,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,12 +26,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.input.key.Key.Companion.Home
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.andoirdsecondhandtradingsystem.HomePage.CategoryList
+import com.example.andoirdsecondhandtradingsystem.HomePage.CategoryTransform
+import com.example.andoirdsecondhandtradingsystem.HomePage.SearchPage
+import com.example.andoirdsecondhandtradingsystem.HomePage.SearchResult
+import com.example.andoirdsecondhandtradingsystem.data.AuthViewModel
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
@@ -37,6 +49,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.selects.select
 import okhttp3.*
 import java.io.IOException
 import java.lang.reflect.Type
@@ -76,12 +89,14 @@ data class ApiResponse<T>(
     val data: T
 )
 
+
 @Composable
-fun AppNavigation(navController: NavHostController, user: Data.User) {
+fun AppNavigation(navController: NavController, user: Data.User,typeId: MutableState<Int>,selectedCategory: MutableState<String>) {
     val navController = rememberNavController()
+    val queryState=remember{ mutableStateOf("")}
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
-            Home(navController, user)
+            Home(navController, user,typeId, selectedCategory)
         }
         composable("detail/{goodsId}") { backStackEntry ->
             val goodsId = backStackEntry.arguments?.getString("goodsId")
@@ -89,28 +104,54 @@ fun AppNavigation(navController: NavHostController, user: Data.User) {
                 GoodsManage(navController, user, it)
             }
         }
+        composable("searchResult?query={query}"){
+                backStackEntry->
+            val query = backStackEntry.arguments?.getString("query")?:""
+            queryState.value=query
+            SearchResult(user = user, navController = navController, searchText =queryState )
     }
+}
 }
 
 @Composable
-fun Home(navController: NavController, user: Data.User) {
+fun Home(navController: NavController, user: Data.User,typeId: MutableState<Int>,selectedCategory: MutableState<String>,viewModel: AuthViewModel = viewModel()) {
     // 使用 remember 保存商品列表的状态
-    var goodsItems by remember { mutableStateOf(listOf<GoodsItem>()) }
-    var errorMessage by remember { mutableStateOf("") }
-    var isRefreshing by remember { mutableStateOf(false) }
-    var currentPage by remember { mutableStateOf(1) }
-    var isLoading by remember { mutableStateOf(false) }
-    var hasMore by remember { mutableStateOf(true) }
+    var goodsItems by rememberSaveable { mutableStateOf(listOf<GoodsItem>()) }
+    var errorMessage by rememberSaveable { mutableStateOf("") }
+    var isRefreshing by rememberSaveable { mutableStateOf(false) }
+    var currentPage by rememberSaveable { mutableStateOf(1) }
+    var isLoading by rememberSaveable { mutableStateOf(false) }
+    var hasMore by rememberSaveable { mutableStateOf(true) }
 
     val swipeRefreshState = remember { SwipeRefreshState(isRefreshing) }
     val gridState = rememberLazyGridState()
 
+    var goodsTypeList by remember { mutableStateOf<List<Data.goodsType>>(emptyList()) }
+    viewModel.getAllGoodsType(
+        onSuccess = { list ->
+            goodsTypeList = list
+        },
+        onError = {
+            // 处理错误逻辑
+            Log.e("GoodsMangeError", it)
+        }
+    )
+
+//    // 获取 SharedPreferences 实例
+//    val sharedPreferences = LocalContext.current.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+//
+//// 恢复选中的分类
+//    val savedCategory = sharedPreferences.getString("selectedCategory", "") ?: ""
+//
+//    selectedCategory.value=savedCategory
+
+
     // 获取商品数据
-    fun fetchGoods(page: Int) {
+    fun fetchGoods(page: Int,typeId: Int) {
         if (isLoading || !hasMore) return
 
         isLoading = true
-        fetchGoods(user, page, { list, total ->
+        fetchGoods(user, page, typeId,{ list, total ->
             if (page == 1) {
                 goodsItems = list
             } else {
@@ -126,9 +167,12 @@ fun Home(navController: NavController, user: Data.User) {
         })
     }
 
+
     // 在Composable中启动网络请求
-    LaunchedEffect(Unit) {
-        fetchGoods(1)
+    LaunchedEffect(typeId.value) {
+        currentPage=1
+        hasMore=true
+        fetchGoods(1,typeId.value)
     }
 
     // 监听列表滚动事件以实现分页加载
@@ -141,17 +185,27 @@ fun Home(navController: NavController, user: Data.User) {
             .collect { lastVisibleItemIndex ->
                 if (lastVisibleItemIndex == goodsItems.lastIndex && !isLoading && hasMore) {
                     currentPage += 1
-                    fetchGoods(currentPage)
+                    fetchGoods(currentPage,typeId.value)
                 }
             }
     }
+    Column(modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        SearchPage(navController)
+        CategoryList(goodsTypeList, { selectedCategory.value= it
+//                                    with(sharedPreferences.edit()){
+//                                        putString("selectedCategory",it)
+//                                        apply()
+//                                    }
+                                    }, selectedCategory,typeId)
 
-    SwipeRefresh(
+        SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
             currentPage = 1
             hasMore = true
-            fetchGoods(1)
+            fetchGoods(1,typeId.value)
         }
     ) {
         Column(
@@ -162,14 +216,14 @@ fun Home(navController: NavController, user: Data.User) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Text(
-                text = "商品列表",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333)
-                ),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+//            Text(
+//                text = "商品列表",
+//                style = MaterialTheme.typography.titleLarge.copy(
+//                    fontWeight = FontWeight.Bold,
+//                    color = Color(0xFF333333)
+//                ),
+//                modifier = Modifier.padding(bottom = 16.dp)
+//            )
 
             if (errorMessage.isNotEmpty()) {
                 Text(text = errorMessage, color = Color.Red)
@@ -193,6 +247,7 @@ fun Home(navController: NavController, user: Data.User) {
                 }
             }
         }
+        }
     }
 }
 
@@ -200,11 +255,12 @@ fun Home(navController: NavController, user: Data.User) {
 fun fetchGoods(
     user: Data.User,
     page: Int,
+    typeId:Int,
     onSuccess: (List<GoodsItem>, Int) -> Unit,
     onError: (String) -> Unit
 ) {
     val gson = Gson()
-    val url = "https://api-store.openguet.cn/api/member/tran/goods/all?userId=${user.id}&current=$page&size=10" // 修改URL参数
+    val url = "https://api-store.openguet.cn/api/member/tran/goods/all?userId=${user.id}&current=$page&size=100&typeId=$typeId" // 修改URL参数
 
     val headers = Headers.Builder()
         .add("appId", "1c92edcbfd42414e8bfee284c6801259")

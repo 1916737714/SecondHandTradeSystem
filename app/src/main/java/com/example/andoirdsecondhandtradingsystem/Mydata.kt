@@ -52,7 +52,7 @@ data class ApiResponse<T>(
 @Composable
 fun MineScreen(navController: NavHostController, user: Data.User, onShowBarsChanged: (Boolean) -> Unit) {
     val totalAmount = remember { mutableStateOf<TotalAmount?>(null) }
-    val balance = remember { mutableStateOf(user.money) }
+    val balance = remember { mutableIntStateOf(user.money) }
     val coroutineScope = rememberCoroutineScope()
 
     val currentUser = rememberUpdatedState(user)
