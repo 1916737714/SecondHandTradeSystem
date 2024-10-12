@@ -30,10 +30,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.HorizontalPageIndicator
 import coil.compose.rememberImagePainter
-import com.google.accompanist.pager.*
+//import com.google.accompanist.pager.*
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
-@OptIn(ExperimentalPagerApi::class)
+//@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun GoodsDetail(navController: NavController,product: Product){
 
@@ -78,26 +78,31 @@ fun GoodsDetail(navController: NavController,product: Product){
                         contentDescription = "默认图片",
                         contentScale = ContentScale.Crop)
                 }else{
-                val pagerState = rememberPagerState()
-                HorizontalPager(
-                    count = product.imageUrlList.size,
-                    state = pagerState,
-                    modifier = Modifier.fillMaxWidth()
-                    ) {page->
-                            Image(
-                                painter = rememberImagePainter(product.imageUrlList[page]),
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
+//                val pagerState = rememberPagerState()
+//                HorizontalPager(
+//                    count = product.imageUrlList.size,
+//                    state = pagerState,
+//                    modifier = Modifier.fillMaxWidth()
+//                    ) {page->
+//                            Image(
+//                                painter = rememberImagePainter(product.imageUrlList[page]),
+//                                contentDescription = null,
+//                                modifier = Modifier.fillMaxSize(),
+//                                contentScale = ContentScale.Crop
+//                            )
+//                }
+//
+//               HorizontalPagerIndicator(
+//                    pagerState=pagerState,
+//                    modifier= Modifier
+//                        .align(Alignment.CenterHorizontally)
+//                        .padding(16.dp)
+//                )
+                    Image(painter = rememberImagePainter(data = product.imageUrlList[0]),
+                        modifier = Modifier.fillMaxSize() ,
+                        contentDescription = "默认图片",
+                        contentScale = ContentScale.Crop)
                 }
-
-               HorizontalPagerIndicator(
-                    pagerState=pagerState,
-                    modifier= Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(16.dp)
-                )}
 
                 Text(text = "￥：${product.price}",
                     modifier = Modifier,

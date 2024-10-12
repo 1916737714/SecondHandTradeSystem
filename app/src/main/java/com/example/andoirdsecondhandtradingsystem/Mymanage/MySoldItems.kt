@@ -2,26 +2,36 @@ package com.example.androidsecondhandtradingsystem
 
 import android.os.NetworkOnMainThreadException
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.andoirdsecondhandtradingsystem.Home.AppNavigation4
+import com.example.andoirdsecondhandtradingsystem.Home.AppNavigation5
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import okhttp3.*
 import java.io.IOException
 import java.lang.reflect.Type
-import java.text.SimpleDateFormat
-import java.util.*
 
 // SoldItem数据类
 data class SoldItem(
@@ -70,18 +80,67 @@ data class ServerResponse<T>(
 )
 
 @Composable
+fun AppNavigation3(navController: NavController, user: Data.User) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            MySoldItems(navController, user)
+        }
+        composable("appNavigation4/{goodsId}/{buyerId}/{buyerName}") { backStackEntry ->
+            val goodsId = backStackEntry.arguments?.getString("goodsId")
+            val buyerId = backStackEntry.arguments?.getString("buyerId")
+            val buyerName = backStackEntry.arguments?.getString("buyerName")
+            if (goodsId != null && buyerId != null && buyerName != null) {
+                AppNavigation5(navController, user, goodsId, buyerId, buyerName)
+            }
+        }
+    }
+}
+
+@Composable
 fun MySoldItems(navController: NavController, user: Data.User) {
-    // 使用remember保存订单列表的状态
     var soldItemList by remember { mutableStateOf(listOf<SoldItem>()) }
     var errorMessage by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var currentPage by remember { mutableStateOf(1) }
+    var hasMore by remember { mutableStateOf(true) }
 
-    // 在Composable中启动网络请求
-    LaunchedEffect(Unit) {
-        fetchSoldItems(user, { list ->
-            soldItemList = list
+    val listState = rememberLazyListState()
+
+    fun fetchSoldItems(page: Int) {
+        if (isLoading || !hasMore) return
+
+        isLoading = true
+        fetchSoldItems(user, page, { list, total ->
+            if (page == 1) {
+                soldItemList = list
+            } else {
+                soldItemList = soldItemList + list
+            }
+            hasMore = soldItemList.size < total
+            isLoading = false
         }, { error ->
             errorMessage = error
+            isLoading = false
         })
+    }
+
+    LaunchedEffect(Unit) {
+        fetchSoldItems(1)
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo }
+            .map { it.visibleItemsInfo }
+            .filter { it.isNotEmpty() }
+            .map { it.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .collect { lastVisibleItemIndex ->
+                if (lastVisibleItemIndex == soldItemList.lastIndex && !isLoading && hasMore) {
+                    currentPage += 1
+                    fetchSoldItems(currentPage)
+                }
+            }
     }
 
     Column(
@@ -105,24 +164,30 @@ fun MySoldItems(navController: NavController, user: Data.User) {
             Text(text = errorMessage, color = Color.Red)
         } else {
             LazyColumn(
+                state = listState,
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(soldItemList) { item ->
-                    DisplaySoldItem(item)
+                    DisplaySoldItem(item, navController)
+                }
+                item {
+                    if (isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                    }
                 }
             }
         }
     }
 }
 
-// 获取已售商品数据的网络请求
 fun fetchSoldItems(
     user: Data.User,
-    onSuccess: (List<SoldItem>) -> Unit,
+    page: Int,
+    onSuccess: (List<SoldItem>, Int) -> Unit,
     onError: (String) -> Unit
 ) {
     val gson = Gson()
-    val url = "https://api-store.openguet.cn/api/member/tran/trading/sell?userId=${user.id}"
+    val url = "https://api-store.openguet.cn/api/member/tran/trading/sell?userId=${user.id}&current=$page&size=10"
 
     val headers = Headers.Builder()
         .add("appId", "1c92edcbfd42414e8bfee284c6801259")
@@ -167,7 +232,7 @@ fun fetchSoldItems(
                                 imageUrlList = record.imageUrlList
                             )
                         }
-                        onSuccess(soldItemList)
+                        onSuccess(soldItemList, dataResponseBody.data.total)
                     } else {
                         onError("请求失败: ${dataResponseBody.msg}")
                     }
@@ -181,11 +246,14 @@ fun fetchSoldItems(
 }
 
 @Composable
-fun DisplaySoldItem(item: SoldItem) {
+fun DisplaySoldItem(item: SoldItem, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                navController.navigate("appNavigation4/${item.goodsId}/${item.buyerId ?: "unknown"}/${item.buyerName ?: "unknown"}")
+            },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -196,9 +264,11 @@ fun DisplaySoldItem(item: SoldItem) {
             AsyncImage(
                 model = item.imageUrlList.firstOrNull(),
                 contentDescription = item.goodsDescription,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(80.dp)
                     .background(Color.Gray)
+                    .fillMaxSize()
             )
 
             Spacer(modifier = Modifier.width(16.dp))

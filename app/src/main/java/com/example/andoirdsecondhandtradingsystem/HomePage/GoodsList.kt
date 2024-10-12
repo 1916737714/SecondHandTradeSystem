@@ -43,6 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import coil.compose.rememberImagePainter
+import com.example.andoirdsecondhandtradingsystem.Home.GoodsItem
 import com.example.andoirdsecondhandtradingsystem.R
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.example.androidsecondhandtradingsystem.ApiResponse
@@ -72,7 +73,7 @@ data class Product(
     val createTime:Long,
     val id:Long,
     val imageCode:Long,
-    val imageUrlList:List<Any>,
+    val imageUrlList:List<String>,
     val price:Int,
     val status:Int,
     val tUserId:Long,
@@ -88,11 +89,41 @@ data class ApiResponseBody<T>(
     val data:T
 )
 
+fun getAllGoods(user: Data.User, onSuccess: (List<Product>) -> Unit, onError: (String) -> Unit) {
+    val allGoods = mutableListOf<Product>()
+    var currentPage = 1
+    val pageSize = 10
+
+    fun fetchPage(page: Int) {
+        getGoods(user, page, { records, total ->
+            allGoods.addAll(records)
+
+            // 计算总页数
+            val totalPages = total / pageSize + if (total % pageSize > 0) 1 else 0
+
+            // 递归请求下一页
+            if (currentPage < totalPages) {
+                currentPage++
+                fetchPage(currentPage)
+            } else {
+                // 所有页数据请求完，回调成功
+                onSuccess(allGoods)
+            }
+        }, { error ->
+            onError(error)
+        })
+    }
+
+    // 开始请求第一页
+    fetchPage(currentPage)
+}
+
 fun getGoods(user: Data.User,
-                     onSuccess: (List<Product>) -> Unit,
+             page:Int,
+                     onSuccess: (List<Product>,Int) -> Unit,
                      onError: (String) -> Unit){
     val gson=Gson()
-    val url="https://api-store.openguet.cn/api/member/tran/goods/all?userId=${user.id}"
+    val url="https://api-store.openguet.cn/api/member/tran/goods/all?userId=${user.id}&current=$page&size=10"
 
     val headers=Headers.Builder()
         .add("Accept","application/json, text/plain, */*")
@@ -121,27 +152,7 @@ fun getGoods(user: Data.User,
                     val dataResponseBody: ApiResponseBody<GoodsResponse> = gson.fromJson(body, jsonType)
 
                     if (dataResponseBody.code == 200) {
-                        val productList = dataResponseBody.data.records.map{ record ->
-                            Product(
-                                addr=record.addr,
-                                appIsShare = record.appIsShare,
-                                appKey = record.appKey,
-                                avatar = record.avatar,
-                                content = record.content,
-                                createTime =record.createTime,
-                                id=record.id,
-                                imageCode=record.imageCode,
-                                imageUrlList=record.imageUrlList,
-                                price=record.price,
-                                status=record.status,
-                                tUserId=record.tUserId,
-                                tuserId=record.tuserId,
-                                typeId=record.typeId,
-                                typeName=record.typeName,
-                                username=record.username
-                            )
-                        }
-                        onSuccess(productList)
+                        onSuccess(dataResponseBody.data.records, dataResponseBody.data.total)
                     } else {
                         onError("请求失败: ${dataResponseBody.msg}")
                     }
@@ -219,7 +230,7 @@ fun ProductItem(product: Product,onClick:()->Unit,x:Int,y:Int) {
     ) {
         // 假设你有一个加载网络图片的函数，这里使用本地资源作为示例
         // Image(painter = rememberImagePainter(data = product.imageUrl), ...)
-        RoundedImage(product = product,x,y)
+        RoundedImage(product,x,y)
         Text(
             text = product.content,
             modifier = Modifier.padding(top = 8.dp),

@@ -11,12 +11,14 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.andoirdsecondhandtradingsystem.Home.AppNavigation
+import com.example.andoirdsecondhandtradingsystem.Home.Home
 import com.example.andoirdsecondhandtradingsystem.R
 import com.example.andoirdsecondhandtradingsystem.data.AuthViewModel
 import com.example.andoirdsecondhandtradingsystem.data.Data
 
 @Composable
-fun CategoryTransform(navController: NavController,viewModel: AuthViewModel = viewModel(),user:Data.User){
+fun CategoryTransform(navController: NavController,viewModel: AuthViewModel = viewModel(),user:Data.User) {
 
     var goodsTypeList by remember { mutableStateOf<List<Data.goodsType>>(emptyList()) }
     viewModel.getAllGoodsType(
@@ -28,26 +30,36 @@ fun CategoryTransform(navController: NavController,viewModel: AuthViewModel = vi
             Log.e("GoodsMangeError", it)
         }
     )
-    val categoryList=listOf("推荐")+goodsTypeList.map{it.type}
+    val categoryList = listOf("推荐") + goodsTypeList.map { it.type }
 
-    val selectedCategory= remember {
-        mutableStateOf(categoryList.firstOrNull()?:"")
+    val selectedCategory = remember {
+        mutableStateOf(categoryList.firstOrNull() ?: "")
     }
 
 
-    CategoryList(categoryList,{selectedCategory.value=it},"推荐")
+//    CategoryList(categoryList, { selectedCategory.value = it }, "推荐")
 
-    var products by remember { mutableStateOf(listOf<Product>())}
-    var errorMessage by remember { mutableStateOf("")}
+    var products by remember { mutableStateOf(listOf<Product>()) }
+    var errorMessage by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        getGoods(user,{
-            list ->
-            products=list
+
+//    LaunchedEffect(Unit) {
+//            getGoods(user,1, onSuccess = {
+//                list->
+//                products=list
+//            },
+//                {
+//                    error->
+//                    errorMessage=error
+//                })
+//    }
+    LaunchedEffect (Unit){
+        getAllGoods(user,{
+            newProducts->
+            products=newProducts
         },{
-            error ->
+            error->
             errorMessage=error
-            Log.e("GoodsFetchError",error)
         })
     }
 
@@ -73,7 +85,6 @@ fun CategoryTransform(navController: NavController,viewModel: AuthViewModel = vi
         navController,
          productsByCategory[selectedCategory.value] ?: emptyList()
     )
-
 
 }
 

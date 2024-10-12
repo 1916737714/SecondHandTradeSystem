@@ -1,5 +1,6 @@
 package com.example.andoirdsecondhandtradingsystem.HomePage
 
+import HomePage
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavController
@@ -15,10 +16,10 @@ import com.google.gson.Gson
 @Composable
 fun MyApp(user: Data.User){
     val navController= rememberNavController()
-    NavHost(navController = navController, startDestination = "mainContent"){
-        composable("mainContent"){
+    NavHost(navController = navController, startDestination = "homePage"){
+        composable("homePage"){
             if (user != null) {
-                MainContent(user,navController)
+                HomePage(navController = navController, user = user)
             }
         }
         composable("goodsDetail/{productJson}"){
@@ -27,11 +28,11 @@ fun MyApp(user: Data.User){
             val product=Gson().fromJson(productJson,Product::class.java)
             GoodsDetail(navController,product = product)
         }
-        composable("searchResult?query={query}"){
-            backStackEntry->
-            val query = backStackEntry.arguments?.getString("query")?:""
-            SearchResult(user = user, navController = navController, searchText =query )
-        }
+//        composable("searchResult?query={query}"){
+//            backStackEntry->
+//            val query = backStackEntry.arguments?.getString("query")?:""
+//            SearchResult(user = user, navController = navController, searchText =query )
+//        }
     }
 }
 

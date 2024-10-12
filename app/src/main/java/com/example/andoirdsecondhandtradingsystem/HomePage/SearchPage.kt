@@ -13,6 +13,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,7 +52,31 @@ fun SearchPage(navController: NavController) {
 
     }
 }
+@Composable
+fun SearchPage2(preText:MutableState<String>) {
+    var searchText by remember {
+        mutableStateOf("")
+    }
+    Row(verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        OutlinedTextField(
+            value = searchText,
+            onValueChange = {searchText=it},
+//            label = { Text(text="请输入查询内容") },
+            shape = RoundedCornerShape(36.dp),
+            modifier = Modifier
+                .height(56.dp)
+                .padding(6.dp)
+        )
+        Button("搜索",modifier=Modifier.fillMaxWidth(), onClick = {
+            preText.value=searchText
+        })
 
+    }
+}
 
 @Composable
 fun Button(string: String,modifier: Modifier,onClick:()->Unit){

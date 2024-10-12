@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
                 if(isLoggedIn) {
                     user?.let {
-                        MyApp(user = it)
+                        MainContent(user = it)
                     }
                 }else {
                     Column(
