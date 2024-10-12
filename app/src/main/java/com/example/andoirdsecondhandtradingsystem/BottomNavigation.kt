@@ -70,6 +70,7 @@ fun MainContent(user: Data.User,navController1: NavController) {
 
             }
                 when (selectedScreen) {
+
                     is ScreenPage.Home -> com.example.andoirdsecondhandtradingsystem.Home.AppNavigation(navController = navController, user = user)
                 is ScreenPage.Love -> Text(text = "Love Screen")
                 is ScreenPage.Capture -> GoodsManage(user)

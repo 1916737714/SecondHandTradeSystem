@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -162,14 +163,14 @@ fun Home(navController: NavController, user: Data.User) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            Text(
-                text = "商品列表",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333)
-                ),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+//            Text(
+//                text = "商品列表",
+//                style = MaterialTheme.typography.titleLarge.copy(
+//                    fontWeight = FontWeight.Bold,
+//                    color = Color(0xFF333333)
+//                ),
+//                modifier = Modifier.padding(bottom = 16.dp)
+//            )
 
             if (errorMessage.isNotEmpty()) {
                 Text(text = errorMessage, color = Color.Red)
@@ -267,8 +268,9 @@ fun GoodsItemView(goodsItem: GoodsItem, navController: NavController, modifier: 
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .background(Color.Gray)
-                    .clip(RoundedCornerShape(16.dp)) // 可调节的圆角
+                    .background(Color.LightGray)
+                    .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.Crop // 根据需要选择适合的 ContentScale 类型// 可调节的圆角
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -320,7 +322,7 @@ fun GoodsItemView(goodsItem: GoodsItem, navController: NavController, modifier: 
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)  // 将头像变为圆角
-                        .background(Color.Gray)
+                        .background(Color.LightGray)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
 

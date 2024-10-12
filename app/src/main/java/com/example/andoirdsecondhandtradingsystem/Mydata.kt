@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,11 +14,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.example.androidsecondhandtradingsystem.MyAmount
@@ -78,9 +81,9 @@ fun MineScreen(navController: NavHostController, user: Data.User) {
                 user = user,
                 totalAmount = totalAmount.value,
                 balance = balance.value,
-                usernameFontSize = 24,
-                userIdFontSize = 18,
-                totalAmountFontSize = 18
+//                usernameFontSize = 24,
+//                userIdFontSize = 18,
+//                totalAmountFontSize = 18
             )
         }
         composable("my_profile/{username}") { backStackEntry ->
@@ -118,14 +121,14 @@ fun Mydata(
     user: Data.User,
     totalAmount: TotalAmount?,
     balance: Int,
-    usernameFontSize: Int = 20,
-    userIdFontSize: Int = 16,
-    totalAmountFontSize: Int = 16
+//    usernameFontSize: Int = 20,
+//    userIdFontSize: Int = 16,
+//    totalAmountFontSize: Int = 16
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF0F0F0))
+            .background(Color(0xFFFFFFFF))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
@@ -133,22 +136,24 @@ fun Mydata(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
+                .background(Color(0xFFF5F2F2), RoundedCornerShape(8.dp))
                 .padding(16.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+//                    .padding(bottom = 16.dp)
             ) {
                 Image(
                     painter = rememberImagePainter(data = user.avatar),
                     contentDescription = "User Avatar",
                     modifier = Modifier
-                        .size(120.dp)
+                        .height(60.dp)
+                        .width(75.dp)
+//                        .size(60.dp)
                         .padding(end = 16.dp)
-                        .clip(RoundedCornerShape(50.dp))
+                        .clip(CircleShape)
                         .clickable { navController.navigate("my_profile/${user.username}") },
                     contentScale = ContentScale.Crop
                 )
@@ -191,7 +196,7 @@ fun Mydata(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
+                    .background(Color(0xFFF5F2F2), RoundedCornerShape(8.dp))
                     .padding(16.dp)
             ) {
                 Row(
@@ -199,14 +204,14 @@ fun Mydata(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "总收入：${it.totalRevenue} 元",
+                        text = "总收入：${it.totalRevenue} ￥",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             color = Color(0xFF333333),
                             fontSize = 15.sp
                         )
                     )
                     Text(
-                        text = "总支出：${it.totalSpending} 元",
+                        text = "总支出：${it.totalSpending} ￥",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             color = Color(0xFF333333),
                             fontSize = 15.sp
@@ -220,7 +225,7 @@ fun Mydata(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
+                .background(Color(0xFFF5F2F2), RoundedCornerShape(8.dp))
                 .padding(16.dp)
         ) {
             Column {
@@ -237,7 +242,7 @@ fun Mydata(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "余额：$balance 元",
+                        text = "余额：$balance ￥",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             color = Color(0xFF333333)
                         )
@@ -259,7 +264,7 @@ fun Mydata(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
+                .background(Color(0xFFF5F2F2), RoundedCornerShape(8.dp))
                 .padding(16.dp)
         ) {
             Column {
@@ -303,7 +308,8 @@ fun Mydata(
                                 painter = painterResource(id = R.drawable.baseline_shopping_cart_24),
                                 contentDescription = null,
                                 tint = Color.Black,
-                                modifier = Modifier.width(50.dp)
+                                modifier = Modifier
+                                    .width(50.dp)
                                     .height(40.dp)
                             )
                             Spacer(modifier = Modifier.height(5.dp))
@@ -368,4 +374,12 @@ suspend fun fetchTotalAmount(userId: String): TotalAmount? = withContext(Dispatc
         e.printStackTrace()
     }
     return@withContext null
+}
+
+@Preview
+@Composable
+fun MyDataPreview() {
+   Mydata(navController = rememberNavController(), user = Data.User("", "", 413, 123, "", ""), totalAmount =  null
+
+       , balance = 1)
 }
