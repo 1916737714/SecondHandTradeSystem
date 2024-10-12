@@ -28,7 +28,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.IOException
 import java.lang.reflect.Type
 
-// 数据类，用于解析商品详情响应
 data class ProductDetails(
     val id: String,
     val appKey: String,
@@ -203,13 +202,12 @@ fun ProductManageView(
                     Text(text = errorMessage, color = Color.Red)
                 } else {
                     productDetails?.let { details ->
-                        Card(
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(4.dp),
-                            shape = RoundedCornerShape(8.dp)
+                                .fillMaxSize()
+                                .padding(8.dp)
+                                .background(Color.White)
+                                .clip(RoundedCornerShape(8.dp))
                         ) {
                             Column(
                                 modifier = Modifier
@@ -329,16 +327,7 @@ fun ProductManageView(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Button(
-                onClick = { /*TODO: 修改信息按钮点击事件*/ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50), // 绿色
-                    contentColor = Color.White
-                ),
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = "修改信息")
-            }
+
 
             Spacer(modifier = Modifier.width(8.dp))
 

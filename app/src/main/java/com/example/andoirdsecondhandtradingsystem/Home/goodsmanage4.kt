@@ -321,16 +321,7 @@ fun ItemDetailsView(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Button(
-                onClick = { /*TODO: 修改信息按钮点击事件*/ },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50), // 绿色
-                    contentColor = Color.White
-                ),
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = "修改信息")
-            }
+
 
             Spacer(modifier = Modifier.width(8.dp))
 
