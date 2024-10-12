@@ -22,8 +22,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
+import com.example.andoirdsecondhandtradingsystem.Message.ChatScreen
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -56,6 +63,31 @@ data class GoodsDetailsResponse(
     val msg: String,
     val data: GoodsDetails
 )
+
+@Composable
+fun AppNavigation9(navController: NavController, user: Data.User, tUserId: String) {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "home") {
+        composable("home") {
+            GoodsManage(navController, user, tUserId)
+        }
+        composable(
+            route = "chatScreen/{fromUserId}/{fromUsername}/{userId}",
+            arguments = listOf(
+                navArgument("fromUserId") { type = NavType.StringType },
+                navArgument("fromUsername") { type = NavType.StringType },
+                navArgument("userId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val fromUserId = backStackEntry.arguments?.getString("fromUserId").orEmpty()
+            val fromUsername = backStackEntry.arguments?.getString("fromUsername").orEmpty()
+            val userId = backStackEntry.arguments?.getString("userId").orEmpty()
+            ChatScreen(fromUserId, fromUsername, userId.toInt(), navController)
+        }
+    }
+}
+
+
 
 @Composable
 fun GoodsManage(navController: NavHostController, user: Data.User, goodsId: String) {
@@ -109,15 +141,80 @@ fun GoodsManage(navController: NavHostController, user: Data.User, goodsId: Stri
         }
     }
 
+
+    var productInfo by remember { mutableStateOf<ProductInfo?>(null) }
+    var errorText by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+
+    fun loadProductInfo() {
+        val url = "https://api-store.openguet.cn/api/member/tran/goods/details?goodsId=$goodsId"
+
+        val headers = Headers.Builder()
+            .add("appId", "1c92edcbfd42414e8bfee284c6801259")
+            .add("appSecret", "80042819ade5505a74c4cb196258423ed4bb0")
+            .add("Accept", "application/json, text/plain, */*")
+            .build()
+
+        val request = Request.Builder()
+            .url(url)
+            .headers(headers)
+            .get()
+            .build()
+
+        try {
+            val client = OkHttpClient()
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    e.printStackTrace()
+                    errorText = "请求失败: ${e.message}"
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    response.use { res ->
+                        val body = res.body?.string()
+
+                        if (res.isSuccessful && body != null) {
+                            val gson = Gson()
+                            val jsonType: Type = object : TypeToken<ProductInfoResponse>() {}.type
+                            val dataResponse: ProductInfoResponse = gson.fromJson(body, jsonType)
+
+                            if (dataResponse.code == 200) {
+                                productInfo = dataResponse.data
+                            } else {
+                                errorText = dataResponse.msg
+                            }
+                        } else {
+                            errorText = "请求失败: ${res.message}"
+                        }
+                    }
+                }
+            })
+        } catch (ex: NetworkOnMainThreadException) {
+            ex.printStackTrace()
+            errorText = "请求失败: ${ex.message}"
+        }
+    }
+
+
+    fun chatWithSeller() {
+        productInfo?.let { info ->
+            navController.navigate("chatScreen/${info.tUserId}/${info.username}/${user.id}")
+        }
+    }
+
     LaunchedEffect(Unit) {
         fetchGoodsDetails()
     }
 
-    GoodsManageView(goodsDetails = goodsDetails, errorMessage = errorMessage, user = user)
+    LaunchedEffect(Unit) {
+        loadProductInfo()
+    }
+
+    GoodsManageView(goodsDetails = goodsDetails, errorMessage = errorMessage, user = user,onChatWithSeller = { chatWithSeller() })
 }
 
 @Composable
-fun GoodsManageView(goodsDetails: GoodsDetails?, errorMessage: String, user: Data.User) {
+fun GoodsManageView(goodsDetails: GoodsDetails?, errorMessage: String, user: Data.User,onChatWithSeller: () -> Unit) {
     val context = LocalContext.current
 
     Box(
@@ -279,7 +376,7 @@ fun GoodsManageView(goodsDetails: GoodsDetails?, errorMessage: String, user: Dat
                 .padding(16.dp)
         ) {
             Button(
-                onClick = { /*TODO: 聊一聊按钮点击事件*/ },
+                onClick = onChatWithSeller,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFFFD700),
                     contentColor = Color.Black

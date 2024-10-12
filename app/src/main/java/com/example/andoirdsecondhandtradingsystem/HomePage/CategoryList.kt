@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -15,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import com.example.andoirdsecondhandtradingsystem.data.Data
 
 
 //@Composable
@@ -35,10 +36,10 @@ import androidx.compose.ui.unit.sp
 
 
 @Composable
-fun CategoryList(categories: List<String>,onCategorySelected:(String)->Unit,defaultCategory: String?) {
-    val selectedCategory=remember {
-        mutableStateOf(defaultCategory)
-    }
+fun CategoryList(categories: List<Data.goodsType>,onCategorySelected:(String)->Unit, selectedCategory:MutableState<String>,typeId:MutableState<Int>) {
+//    val selectedCategory=remember {
+//        mutableStateOf(defaultCategory?:"")
+//    }
 
     LazyRow(
         contentPadding = PaddingValues(horizontal = 8.dp), // 设置水平方向的内边距
@@ -46,16 +47,17 @@ fun CategoryList(categories: List<String>,onCategorySelected:(String)->Unit,defa
         verticalAlignment = Alignment.CenterVertically // 设置子项在垂直方向上的对齐方式
     ) {
         items(categories) { category ->
-            val isSelected=category==selectedCategory.value
+            val isSelected=category.type==selectedCategory.value
             Text(
-                text = category,
+                text = category.type,
                 fontSize = 24.sp,
                 color = if(isSelected)Color.Red else Color.Black,
                 modifier = Modifier
                     .height(48.dp)
                     .clickable{
-                        selectedCategory.value=category
-                        onCategorySelected(category)
+                        selectedCategory.value=category.type
+                        onCategorySelected(category.type)
+                        typeId.value=category.id
                     }
             )
         }

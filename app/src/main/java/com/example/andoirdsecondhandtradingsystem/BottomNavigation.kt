@@ -22,13 +22,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.andoirdsecondhandtradingsystem.Goods.GoodsManage
 import com.example.andoirdsecondhandtradingsystem.Home.Home
+import com.example.andoirdsecondhandtradingsystem.HomePage.MyApp
 import com.example.andoirdsecondhandtradingsystem.Message.AppNavigation
 import com.example.andoirdsecondhandtradingsystem.data.Data
 
 
 //底部导航栏
 @Composable
-fun MainContent(user: Data.User,navController1: NavController) {
+fun MainContent(user: Data.User) {
 
     var selectedScreen by remember { mutableStateOf<ScreenPage>(ScreenPage.Home) }
     var topBarTitle by remember { mutableStateOf("Home") }  // 用于存储顶部标题
@@ -69,16 +70,22 @@ fun MainContent(user: Data.User,navController1: NavController) {
             ) {
 
             }
+            val typeId=remember{ mutableStateOf(1)}
+            val selectedCategory = remember {
+                mutableStateOf("手机")
+            }
                 when (selectedScreen) {
+                    is ScreenPage.Home -> com.example.andoirdsecondhandtradingsystem.Home.AppNavigation(navController = navController, user = user, typeId,selectedCategory)
+//                    is ScreenPage.Home-> MyApp(user = user)
 
-                    is ScreenPage.Home -> com.example.andoirdsecondhandtradingsystem.Home.AppNavigation(navController = navController, user = user)
                 is ScreenPage.Love -> Text(text = "Love Screen")
                 is ScreenPage.Capture -> GoodsManage(user)
                 is ScreenPage.Message ->  AppNavigation(navController, selectedScreen,user){showBars = it}
     //                        MessageScreen(navController)
-                    is ScreenPage.Mine -> MineScreen(navController = navController, user = user)
+                    is ScreenPage.Mine -> MineScreen(navController = navController, user = user){showBars = it}
 //                    Text(text = "Mine Screen")
             }
+
         }
     }
 }

@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberImagePainter
 import com.example.andoirdsecondhandtradingsystem.data.Data
 import com.example.androidsecondhandtradingsystem.MyAmount
@@ -52,9 +53,9 @@ data class ApiResponse<T>(
 )
 
 @Composable
-fun MineScreen(navController: NavHostController, user: Data.User) {
+fun MineScreen(navController: NavHostController, user: Data.User, onShowBarsChanged: (Boolean) -> Unit) {
     val totalAmount = remember { mutableStateOf<TotalAmount?>(null) }
-    val balance = remember { mutableStateOf(user.money) }
+    val balance = remember { mutableIntStateOf(user.money) }
     val coroutineScope = rememberCoroutineScope()
 
     val currentUser = rememberUpdatedState(user)
@@ -74,45 +75,64 @@ fun MineScreen(navController: NavHostController, user: Data.User) {
         }
     }
 
-    NavHost(navController = navController, startDestination = "my_data") {
-        composable("my_data") {
-            Mydata(
-                navController = navController,
-                user = user,
-                totalAmount = totalAmount.value,
-                balance = balance.value,
-//                usernameFontSize = 24,
-//                userIdFontSize = 18,
-//                totalAmountFontSize = 18
-            )
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    // 控制导航栏的显示
+    LaunchedEffect(currentRoute) {
+        onShowBarsChanged(currentRoute !in setOf("my_merchandise/{username}", "my_orders/{username}", "my_sold_items/{username}"))
+    }
+
+    Scaffold(
+        bottomBar = {
+            if (currentRoute !in setOf("my_merchandise/{username}", "my_orders/{username}", "my_sold_items/{username}")) {
+                BottomNavigationBar(navController)
+            }
+
         }
-        composable("my_profile/{username}") { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
-            MyProfile(navController = navController, user = user)
-        }
-        composable("my_merchandise/{username}") { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
-            AppNavigation1(navController = navController, user = user)
-        }
-        composable("my_orders/{username}") { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
-            AppNavigation2(navController = navController, user = user)
-        }
-        composable("my_amount/{username}") { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
-            MyAmount(navController = navController, user = user, onBalanceChanged = { newBalance ->
-                updateBalanceAndTotalAmount(newBalance)
-            })
-        }
-        composable("my_sold_items/{username}") { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
-            AppNavigation3(navController = navController, user = user)
-        }
-        composable("my_transaction/{username}") { backStackEntry ->
-            val username = backStackEntry.arguments?.getString("username") ?: ""
-            MyTransaction(navController = navController, user = user)
+    ) { paddingValues ->
+        NavHost(navController = navController, startDestination = "my_data", Modifier.padding(paddingValues)) {
+            composable("my_data") {
+                Mydata(
+                    navController = navController,
+                    user = user,
+                    totalAmount = totalAmount.value,
+                    balance = balance.value,
+                )
+            }
+            composable("my_profile/{username}") { backStackEntry ->
+                val username = backStackEntry.arguments?.getString("username") ?: ""
+                MyProfile(navController = navController, user = user)
+            }
+            composable("my_merchandise/{username}") { backStackEntry ->
+                val username = backStackEntry.arguments?.getString("username") ?: ""
+                AppNavigation1(navController = navController, user = user)
+            }
+            composable("my_orders/{username}") { backStackEntry ->
+                val username = backStackEntry.arguments?.getString("username") ?: ""
+                AppNavigation2(navController = navController, user = user)
+            }
+            composable("my_amount/{username}") { backStackEntry ->
+                val username = backStackEntry.arguments?.getString("username") ?: ""
+                MyAmount(navController = navController, user = user, onBalanceChanged = { newBalance ->
+                    updateBalanceAndTotalAmount(newBalance)
+                })
+            }
+            composable("my_sold_items/{username}") { backStackEntry ->
+                val username = backStackEntry.arguments?.getString("username") ?: ""
+                AppNavigation3(navController = navController, user = user)
+            }
+            composable("my_transaction/{username}") { backStackEntry ->
+                val username = backStackEntry.arguments?.getString("username") ?: ""
+                MyTransaction(navController = navController, user = user)
+            }
         }
     }
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavHostController) {
+    // 实现底部导航栏的内容
 }
 
 @Composable
