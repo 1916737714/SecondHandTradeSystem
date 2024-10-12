@@ -98,10 +98,10 @@ fun AppNavigation(navController: NavController, user: Data.User,typeId: MutableS
         composable("home") {
             Home(navController, user,typeId, selectedCategory)
         }
-        composable("detail/{goodsId}") { backStackEntry ->
+        composable("appNavigation9/{goodsId}") { backStackEntry ->
             val goodsId = backStackEntry.arguments?.getString("goodsId")
             goodsId?.let {
-                GoodsManage(navController, user, it)
+                AppNavigation9(navController, user, it)
             }
         }
         composable("searchResult?query={query}"){
@@ -232,7 +232,7 @@ fun Home(navController: NavController, user: Data.User,typeId: MutableState<Int>
                     state = gridState,
                     columns = GridCells.Fixed(2),
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(8.dp),
+                    contentPadding = PaddingValues(0.5.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -307,7 +307,7 @@ fun GoodsItemView(goodsItem: GoodsItem, navController: NavController, modifier: 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { navController.navigate("detail/${goodsItem.id}") }
+            .clickable { navController.navigate("appNavigation9/${goodsItem.id}") }
             .padding(8.dp)
             .scale(1.05f),
         colors = CardDefaults.cardColors(containerColor = Color.White),
