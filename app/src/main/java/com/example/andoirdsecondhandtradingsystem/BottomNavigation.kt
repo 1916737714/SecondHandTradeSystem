@@ -38,7 +38,7 @@ fun MainContent(user: Data.User) {
 
     Scaffold(
         topBar = {
-            if(showBars){
+            if(showBars&&selectedScreen!=ScreenPage.Home){
                 TopBar(title = topBarTitle)// 显示顶部导航栏
             }
 
@@ -75,7 +75,7 @@ fun MainContent(user: Data.User) {
                 mutableStateOf("手机")
             }
                 when (selectedScreen) {
-                    is ScreenPage.Home -> com.example.andoirdsecondhandtradingsystem.Home.AppNavigation(navController = navController, user = user, typeId,selectedCategory)
+                    is ScreenPage.Home -> com.example.andoirdsecondhandtradingsystem.Home.AppNavigation(navController = navController, user = user, typeId,selectedCategory){showBars = it}
 //                    is ScreenPage.Home-> MyApp(user = user)
                 is ScreenPage.Love -> Text(text = "Love Screen")
                 is ScreenPage.Capture -> GoodsManage(user)

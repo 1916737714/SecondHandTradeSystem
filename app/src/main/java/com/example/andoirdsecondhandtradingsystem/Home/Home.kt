@@ -33,8 +33,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.example.andoirdsecondhandtradingsystem.BottomNavigationBar
 import com.example.andoirdsecondhandtradingsystem.HomePage.CategoryList
 import com.example.andoirdsecondhandtradingsystem.HomePage.CategoryTransform
 import com.example.andoirdsecondhandtradingsystem.HomePage.SearchPage
@@ -89,12 +91,30 @@ data class ApiResponse<T>(
     val data: T
 )
 
-
+//@ExperimentalMaterial3Api
 @Composable
-fun AppNavigation(navController: NavController, user: Data.User,typeId: MutableState<Int>,selectedCategory: MutableState<String>) {
-    val navController = rememberNavController()
+fun AppNavigation(navController: NavHostController, user: Data.User,typeId: MutableState<Int>,selectedCategory: MutableState<String>,onShowBarsChanged: (Boolean) -> Unit) {
+//    val navController = rememberNavController()
     val queryState=remember{ mutableStateOf("")}
-    NavHost(navController = navController, startDestination = "home") {
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+
+    LaunchedEffect(currentRoute) {
+        onShowBarsChanged(currentRoute !in setOf("appNavigation9/{goodsId}", "searchResult?query={query}"))
+    }
+
+    Scaffold(
+
+//        bottomBar = {
+//            if (currentRoute !in setOf("appNavigation9/{goodsId}", "searchResult?query={query}")) {
+//                BottomNavigationBar(navController)
+//            }
+//        }
+
+    ) { paddingValues ->
+    NavHost(navController = navController, startDestination = "home",Modifier.padding(paddingValues)) {
         composable("home") {
             Home(navController, user,typeId, selectedCategory)
         }
@@ -112,6 +132,7 @@ fun AppNavigation(navController: NavController, user: Data.User,typeId: MutableS
     }
 }
 }
+    }
 
 @Composable
 fun Home(navController: NavController, user: Data.User,typeId: MutableState<Int>,selectedCategory: MutableState<String>,viewModel: AuthViewModel = viewModel()) {

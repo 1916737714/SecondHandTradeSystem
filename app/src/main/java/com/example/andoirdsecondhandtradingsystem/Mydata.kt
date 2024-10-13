@@ -75,6 +75,7 @@ fun MineScreen(navController: NavHostController, user: Data.User, onShowBarsChan
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+
     // 控制导航栏的显示
     LaunchedEffect(currentRoute) {
         onShowBarsChanged(currentRoute !in setOf("my_merchandise/{username}", "my_orders/{username}", "my_sold_items/{username}"))
