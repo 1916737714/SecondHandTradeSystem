@@ -216,11 +216,11 @@ fun MessageItem(message: Data.MessageRecord, onMessageClick: (Int) -> Unit) {
                         )
                     }
                     Box(modifier = Modifier.size(64.dp)) {
-                        Image(
-                            painter = painterResource(id = R.drawable.image5),
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp)
-                        )
+//                        Image(
+//                            painter = painterResource(id = R.drawable.image5),
+//                            contentDescription = null,
+//                            modifier = Modifier.size(64.dp)
+//                        )
                     }
                 }
                 HorizontalDivider(thickness = 1.dp, color = Color.Gray)
